@@ -1,0 +1,82 @@
+package com.line4kk.gesture3dviewer;
+
+import javafx.fxml.FXML;
+import javafx.scene.*;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.Box;
+import javafx.scene.shape.Shape3D;
+import javafx.scene.transform.Rotate;
+
+public class MainScene {
+
+    @FXML
+    private Pane mainScene;
+    private Node model;
+    private Camera camera;
+
+    @FXML
+    public void initialize() {
+        // JavaFX вызовет автоматически
+        Group world = new Group();  // "мир" на сцене - группа
+
+
+        model = new Box(100, 100, 100);  // Объект на сцене - куб (временно)
+
+        if (model instanceof Shape3D shape) {
+            shape.setMaterial(new PhongMaterial(Color.BLUE));
+        }
+
+        AmbientLight ambientLight = new AmbientLight(Color.color(0.2, 0.2, 0.2));
+        PointLight pointLight = new PointLight();
+        pointLight.setTranslateZ(-200);
+
+        world.getChildren().addAll(model, pointLight, ambientLight);
+
+        SubScene scene3D = new SubScene(world, 700, 400, true, SceneAntialiasing.BALANCED);
+
+        camera = new PerspectiveCamera(true);
+        camera.setTranslateZ(-450);
+        scene3D.setCamera(camera);
+        camera.setNearClip(0.1);
+        camera.setFarClip(10000);
+
+        scene3D.widthProperty().bind(mainScene.widthProperty());
+        scene3D.heightProperty().bind(mainScene.heightProperty());
+        scene3D.setFill(Color.rgb(120, 191, 222));
+
+        mainScene.getChildren().add(scene3D);
+    }
+
+    public void rotateXYModelBy(double x, double y) {
+        if (x != 0)
+            model.getTransforms().add(0, new Rotate(x, Rotate.X_AXIS));
+        if (y != 0)
+            model.getTransforms().add(0, new Rotate(y, Rotate.Y_AXIS));
+    }
+
+    public void rotateZModelBy(double z) {
+        if (z != 0)
+            model.getTransforms().add(0, new Rotate(z, Rotate.Z_AXIS));
+    }
+
+    public void moveCameraBy(double x, double y) {
+        if (x != 0)
+            camera.setTranslateX(camera.getTranslateX() + x);
+        if (y != 0)
+            camera.setTranslateY(camera.getTranslateY() + y);
+    }
+
+    public void changeCameraScaleBy(double z) {
+        if (z != 0)
+            camera.setTranslateZ(camera.getTranslateZ() + z);
+    }
+
+    public void resetView() {
+        camera.setTranslateX(0);
+        camera.setTranslateY(0);
+        camera.setTranslateZ(-450);
+    }
+
+}
