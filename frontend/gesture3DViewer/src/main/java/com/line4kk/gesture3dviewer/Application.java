@@ -61,6 +61,10 @@ public class Application extends javafx.application.Application {
             }
         });
 
+        DataReceiver receiver = new DataReceiver();
+        Thread thread = new Thread(receiver);
+        thread.setDaemon(true);
+        thread.start();
 
         stage.show();
     }
