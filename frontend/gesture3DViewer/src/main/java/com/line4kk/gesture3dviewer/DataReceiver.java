@@ -9,6 +9,7 @@ import org.zeromq.ZMQ;
 public class DataReceiver implements Runnable {
     private final String address;
     private volatile boolean running = true;
+    private final Accumulator accumulator = new Accumulator();
 
     public DataReceiver() {
         address = "tcp://localhost:5555";
@@ -28,6 +29,7 @@ public class DataReceiver implements Runnable {
                 try {
                     GestureMessage gestureMessage = mapper.readValue(message, GestureMessage.class);
                     System.out.println(gestureMessage);
+                    accumulator.accumulate(gestureMessage);
                 } catch (JsonProcessingException e) {
                     // Error logg
                 }
@@ -38,5 +40,9 @@ public class DataReceiver implements Runnable {
 
     public void stop() {
         running = false;
+    }
+
+    public Accumulator getAccumulator() {
+        return accumulator;
     }
 }

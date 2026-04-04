@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.line4kk.gesture3dviewer.MainScene">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.line4kk.gesture3dviewer.SceneController">
    <bottom>
       <HBox alignment="CENTER_LEFT" maxHeight="20.0" minHeight="20.0" prefHeight="20.0" spacing="10.0" style="-fx-background-color: gray;" BorderPane.alignment="CENTER">
          <children>

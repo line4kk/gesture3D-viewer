@@ -1,5 +1,7 @@
 package com.line4kk.gesture3dviewer;
 
+import com.line4kk.gesture3dviewer.model.AccumulatedData;
+import javafx.animation.AnimationTimer;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
@@ -8,6 +10,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class Application extends javafx.application.Application {
+    private static SceneController controller;
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("main-view.fxml"));
@@ -15,7 +18,7 @@ public class Application extends javafx.application.Application {
         stage.setTitle("Gesture3D Viewer");
         stage.setScene(scene);
 
-        MainScene controller = fxmlLoader.getController();
+        controller = fxmlLoader.getController();
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.RIGHT) {
                 controller.rotateXYModelBy(0, -15);
@@ -66,6 +69,22 @@ public class Application extends javafx.application.Application {
         thread.setDaemon(true);
         thread.start();
 
+        AnimationTimer timer = new AnimationTimer() {
+            @Override
+            public void handle(long l) {
+                AccumulatedData accumulatedData = receiver.getAccumulator().consume();
+                if (accumulatedData.getDegreesX() != 0 || accumulatedData.getDegreesY() != 0) {
+                    controller.rotateXYModelBy(accumulatedData.getDegreesX(), accumulatedData.getDegreesY());
+                }
+            }
+        };
+
+        timer.start();
+
         stage.show();
+    }
+
+    public static SceneController getController() {
+        return controller;
     }
 }

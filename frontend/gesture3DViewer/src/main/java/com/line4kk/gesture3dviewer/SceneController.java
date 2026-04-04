@@ -9,7 +9,7 @@ import javafx.scene.shape.Box;
 import javafx.scene.shape.Shape3D;
 import javafx.scene.transform.Rotate;
 
-public class MainScene {
+public class SceneController {
 
     @FXML
     private Pane mainScene;
@@ -49,16 +49,16 @@ public class MainScene {
         mainScene.getChildren().add(scene3D);
     }
 
-    public void rotateXYModelBy(double x, double y) {
-        if (x != 0)
-            model.getTransforms().add(0, new Rotate(x, Rotate.X_AXIS));
-        if (y != 0)
-            model.getTransforms().add(0, new Rotate(y, Rotate.Y_AXIS));
+    public void rotateXYModelBy(double xAxis, double yAxis) {
+        if (xAxis != 0)
+            model.getTransforms().add(0, new Rotate(xAxis, Rotate.X_AXIS));
+        if (yAxis != 0)
+            model.getTransforms().add(0, new Rotate(yAxis, Rotate.Y_AXIS));
     }
 
-    public void rotateZModelBy(double z) {
-        if (z != 0)
-            model.getTransforms().add(0, new Rotate(z, Rotate.Z_AXIS));
+    public void rotateZModelBy(double zAxis) {
+        if (zAxis != 0)
+            model.getTransforms().add(0, new Rotate(zAxis, Rotate.Z_AXIS));
     }
 
     public void moveCameraBy(double x, double y) {
