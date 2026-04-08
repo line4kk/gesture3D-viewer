@@ -5,6 +5,10 @@ from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.vision import GestureRecognizerOptions
 import logging
 import time
+
+from src.gesture_detectors.rotate_detector import RotateDetector
+from src.gesture_handler import GestureHandler
+
 logging.basicConfig(level=logging.DEBUG)
 
 prev_x = -1
@@ -27,7 +31,7 @@ if __name__ == "__main__":
     options = GestureRecognizerOptions(
         base_options=base_options,
         running_mode=VisionRunningMode.VIDEO,
-        num_hands=1,
+        num_hands=2,
         min_hand_detection_confidence=0.5,
         min_hand_presence_confidence=0.5,
         min_tracking_confidence=0.5,
@@ -39,8 +43,13 @@ if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
 
     sender = DataSender()
+
+    gesture_handler = GestureHandler([RotateDetector()], [])
+
+    prev_frame = None
     while cap.isOpened():
         ret, frame = cap.read()
+
         if not ret:
             break
 
@@ -53,40 +62,14 @@ if __name__ == "__main__":
             int(cap.get(cv2.CAP_PROP_POS_MSEC))  # timestamp в мс
         )
 
+        result_data = gesture_handler.handle(results)
+        if result_data:
+            sender.send(result_data)
 
-        data = {}
-        if results.gestures:
-            gesture = results.gestures[0][0]
+        # cv2.imshow("Gesture Recognition", frame)
 
-            if gesture.category_name == "Open_Palm":
-                data["type"] = "rotate"
-                hand_landmarks = results.hand_landmarks[0]
-
-                if prev_x != -1:
-                    dx = hand_landmarks[0].x - prev_x
-                else:
-                    dx = 0
-                if prev_y != -1:
-                    dy = hand_landmarks[0].y - prev_y
-                else:
-                    dy = 0
-
-                prev_x = hand_landmarks[0].x
-                prev_y = hand_landmarks[0].y
-
-                data["dx"] = dx
-                data["dy"] = dy
-                sender.send(data)
-                sumdx += dx
-                sumdy += dy
-        else:
-            prev_x = -1
-            prev_y = -1
-        cv2.imshow("Gesture Recognition", frame)
-
-        if cv2.waitKey(1) & 0xFF == 27:
-            break
-
+        # if cv2.waitKey(1) & 0xFF == 27:
+        #     break
     cap.release()
     cv2.destroyAllWindows()
     sender.close()
