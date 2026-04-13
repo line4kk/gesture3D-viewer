@@ -11,6 +11,14 @@ class DataSender:
         self.closed = False
 
         self.logger = logging.getLogger(__name__)
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter(
+            "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+        )
+        handler.setFormatter(formatter)
+        self.logger.addHandler(handler)
+        self.logger.setLevel(logging.DEBUG)
+
         time.sleep(1)
 
     def send(self, data: dict):
