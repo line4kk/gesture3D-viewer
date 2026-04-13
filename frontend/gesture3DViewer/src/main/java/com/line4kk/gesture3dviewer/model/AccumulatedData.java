@@ -4,12 +4,16 @@ public class AccumulatedData {
     private double degreesX;
     private double degreesY;
     private double degreesZ;
+    private double dxCameraPan;
+    private double dyCameraPan;
     private double deltaScale;
 
-    public AccumulatedData(double degreesX, double degreesY, double degreesZ, double deltaScale) {
+    public AccumulatedData(double degreesX, double degreesY, double degreesZ, double dxCameraPan, double dyCameraPan, double deltaScale) {
         this.degreesX = degreesX;
         this.degreesY = degreesY;
         this.degreesZ = degreesZ;
+        this.dxCameraPan = dxCameraPan;
+        this.dyCameraPan = dyCameraPan;
         this.deltaScale = deltaScale;
     }
 
@@ -43,5 +47,21 @@ public class AccumulatedData {
 
     public double getDeltaScale() {
         return deltaScale;
+    }
+
+    public double getDyCameraPan() {
+        return dyCameraPan;
+    }
+
+    public void setDyCameraPan(double dyCameraPan) {
+        this.dyCameraPan = dyCameraPan;
+    }
+
+    public double getDxCameraPan() {
+        return dxCameraPan;
+    }
+
+    public void setDxCameraPan(double dxCameraPan) {
+        this.dxCameraPan = dxCameraPan;
     }
 }

@@ -5,7 +5,7 @@ public class GestureMessage {
     public Double dx;
     public Double dy;
     public Double dz;
-    public Double scale;
+    public Double dr;
 
     @Override
     public String toString() {
@@ -14,7 +14,7 @@ public class GestureMessage {
                 ", dx=" + dx +
                 ", dy=" + dy +
                 ", dz=" + dz +
-                ", scale=" + scale +
+                ", dr=" + dr +
                 '}';
     }
 }

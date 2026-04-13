@@ -76,6 +76,12 @@ public class Application extends javafx.application.Application {
                 if (accumulatedData.getDegreesX() != 0 || accumulatedData.getDegreesY() != 0) {
                     controller.rotateXYModelBy(accumulatedData.getDegreesX(), accumulatedData.getDegreesY());
                 }
+                if (accumulatedData.getDxCameraPan() != 0 || accumulatedData.getDyCameraPan() != 0) {
+                    controller.moveCameraBy(accumulatedData.getDxCameraPan(), accumulatedData.getDyCameraPan());
+                }
+                if (accumulatedData.getDeltaScale() != 0) {
+                    controller.changeCameraScaleBy(accumulatedData.getDeltaScale());
+                }
             }
         };
 

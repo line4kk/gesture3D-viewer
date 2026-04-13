@@ -8,6 +8,8 @@ public class Accumulator {
     private double degreesX = 0.0;
     private double degreesY = 0.0;
     private double degreesZ = 0.0;
+    private double dxCameraPan = 0.0;
+    private double dyCameraPan = 0.0;
     private double deltaScale = 0.0;
 
     public synchronized void accumulate(GestureMessage message) {
@@ -16,14 +18,22 @@ public class Accumulator {
                 degreesX += message.dy * SensitivitySettings.rotateSensitivity;
                 degreesY += message.dx * SensitivitySettings.rotateSensitivity;
                 break;
+            case "camera_pan":
+                dxCameraPan += message.dx * SensitivitySettings.cameraPanSensitivity;
+                dyCameraPan += message.dy * -SensitivitySettings.cameraPanSensitivity;
+                break;
+            case "camera_scale":
+                deltaScale += message.dr * SensitivitySettings.cameraScaleSensitivity;
         }
     }
 
     public synchronized AccumulatedData consume() {
-        AccumulatedData data = new AccumulatedData(degreesX, degreesY, degreesZ, deltaScale);
+        AccumulatedData data = new AccumulatedData(degreesX, degreesY, degreesZ, dxCameraPan, dyCameraPan, deltaScale);
         degreesX = 0.0;
         degreesY = 0.0;
         degreesZ = 0.0;
+        dxCameraPan = 0.0;
+        dyCameraPan = 0.0;
         deltaScale = 0.0;
         return data;
     }
