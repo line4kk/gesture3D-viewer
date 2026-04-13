@@ -7,5 +7,5 @@ class GestureDetector(ABC):
         pass
 
     @abstractmethod
-    def reset_state(self):
+    def is_detected(self):
         pass

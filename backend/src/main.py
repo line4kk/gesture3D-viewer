@@ -6,10 +6,12 @@ from mediapipe.tasks.python.vision import GestureRecognizerOptions
 import logging
 import time
 
+from src.gesture_detectors.camera_pan_detector import CameraPanDetector
 from src.gesture_detectors.rotate_detector import RotateDetector
+from src.gesture_detectors.scale_gesture_detector import ScaleDetector
 from src.gesture_handler import GestureHandler
 
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 
 prev_x = -1
 prev_y = -1
@@ -44,7 +46,7 @@ if __name__ == "__main__":
 
     sender = DataSender()
 
-    gesture_handler = GestureHandler([RotateDetector()], [])
+    gesture_handler = GestureHandler([CameraPanDetector(), ScaleDetector(), RotateDetector()])
 
     prev_frame = None
     while cap.isOpened():
@@ -66,10 +68,15 @@ if __name__ == "__main__":
         if result_data:
             sender.send(result_data)
 
-        # cv2.imshow("Gesture Recognition", frame)
+        for hand_landmarks in results.hand_landmarks:
+            for idx, landmark in enumerate(hand_landmarks):
+                x = int(landmark.x * frame.shape[1])
+                y = int(landmark.y * frame.shape[0])
+                cv2.circle(frame, (x, y), 4, (255, 0, 0), -1)
+        cv2.imshow("Gesture Recognition", frame)
 
-        # if cv2.waitKey(1) & 0xFF == 27:
-        #     break
+        if cv2.waitKey(1) & 0xFF == 27:
+            break
     cap.release()
     cv2.destroyAllWindows()
     sender.close()
