@@ -10,6 +10,8 @@ from src.gesture_detectors.camera_pan_detector import CameraPanDetector
 from src.gesture_detectors.rotate_detector import RotateDetector
 from src.gesture_detectors.scale_gesture_detector import ScaleDetector
 from src.gesture_handler import GestureHandler
+from src.gesture_recognizers import is_L_gesture
+from src import gesture_recognizers
 
 #logging.basicConfig(level=logging.DEBUG)
 
@@ -42,13 +44,13 @@ if __name__ == "__main__":
     # Создаём распознаватель
     recognizer = vision.GestureRecognizer.create_from_options(options)
 
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
 
     sender = DataSender()
 
     gesture_handler = GestureHandler([CameraPanDetector(), ScaleDetector(), RotateDetector()])
 
-    prev_frame = None
+    i = 0
     while cap.isOpened():
         ret, frame = cap.read()
 
@@ -63,6 +65,10 @@ if __name__ == "__main__":
             mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame),
             int(cap.get(cv2.CAP_PROP_POS_MSEC))  # timestamp в мс
         )
+        #print(is_L_gesture(results))
+        if results.gestures:
+            if not is_L_gesture(results):
+                cv2.imwrite(f"imgs\\{i} - {gesture_recognizers.error}.png", frame)
 
         result_data = gesture_handler.handle(results)
         if result_data:
@@ -70,13 +76,15 @@ if __name__ == "__main__":
 
         for hand_landmarks in results.hand_landmarks:
             for idx, landmark in enumerate(hand_landmarks):
-                x = int(landmark.x * frame.shape[1])
-                y = int(landmark.y * frame.shape[0])
-                cv2.circle(frame, (x, y), 4, (255, 0, 0), -1)
+                #if idx < 5:
+                    x = int(landmark.x * frame.shape[1])
+                    y = int(landmark.y * frame.shape[0])
+                    cv2.circle(frame, (x, y), 4, (255, 0, 0), -1)
         cv2.imshow("Gesture Recognition", frame)
 
         if cv2.waitKey(1) & 0xFF == 27:
             break
+        i += 1
     cap.release()
     cv2.destroyAllWindows()
     sender.close()
