@@ -114,24 +114,29 @@ def is_L_gesture(rcg_result: GestureRecognizerResult):
     # if not rcg_result.gestures:
     #     return False
     global error
+    error = ""
     hand_landmarks = rcg_result.hand_landmarks[0]
+    score = 0
     if not is_thumb_straight(hand_landmarks):
         print("False, большой палец не прямой")
-        error = "False, thumb is not extended"
-        return False
+        error += "thumb "
     if not is_finger_straight(hand_landmarks, 1):
         print("False, указательный палец не прямой")
-        error = "False, index is not extended"
-        return False
+        error += "index "
+    if is_thumb_straight(hand_landmarks) and is_finger_straight(hand_landmarks, 1):
+        score += 1
 
     for finger in range(2, 5):
         if not is_finger_curled(hand_landmarks, finger):
             print("False, палец", finger, "не согнут")
-            error = f"False, {finger} is not curled"
-            return False
-
+            error += f"{finger} "
+        else:
+            score += 0.5
     """if not is_angle_between_thumb_and_index(hand_landmarks):
         return False"""
 
-    print("True, все гудик")
-    return True
+    result = score >= 2
+    print(result, score)
+    if not result:
+        error += f"{score}"
+    return result
