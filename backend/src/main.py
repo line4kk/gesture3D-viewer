@@ -51,6 +51,8 @@ if __name__ == "__main__":
     gesture_handler = GestureHandler([CameraPanDetector(), ScaleDetector(), RotateDetector()])
 
     i = 0
+
+    debug_file = open("imgs\\debug.txt", "w")
     while cap.isOpened():
         ret, frame = cap.read()
 
@@ -65,21 +67,23 @@ if __name__ == "__main__":
             mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame),
             int(cap.get(cv2.CAP_PROP_POS_MSEC))  # timestamp в мс
         )
-        #print(is_L_gesture(results))
-        if results.gestures:
-            if not is_L_gesture(results):
-                cv2.imwrite(f"imgs\\{i} - {gesture_recognizers.error}.png", frame)
-
-        result_data = gesture_handler.handle(results)
-        if result_data:
-            sender.send(result_data)
-
         for hand_landmarks in results.hand_landmarks:
             for idx, landmark in enumerate(hand_landmarks):
                 #if idx < 5:
                     x = int(landmark.x * frame.shape[1])
                     y = int(landmark.y * frame.shape[0])
                     cv2.circle(frame, (x, y), 4, (255, 0, 0), -1)
+        #print(is_L_gesture(results))
+        if results.gestures:
+            if is_L_gesture(results):
+                cv2.imwrite(f"imgs\\{i} - {gesture_recognizers.error}.png", frame)
+                debug_file.write(f"{i}: {gesture_recognizers.detail_error}\n\n")
+
+        result_data = gesture_handler.handle(results)
+        if result_data:
+            sender.send(result_data)
+
+
         cv2.imshow("Gesture Recognition", frame)
 
         if cv2.waitKey(1) & 0xFF == 27:
@@ -88,6 +92,7 @@ if __name__ == "__main__":
     cap.release()
     cv2.destroyAllWindows()
     sender.close()
+    debug_file.close()
 
 
 
