@@ -9,6 +9,7 @@ from src.gesture_detectors.reset_view_detector import ResetViewDetector
 from src.gesture_detectors.rotate_detector import RotateDetector
 from src.gesture_detectors.rotate_z_detector import RotateZDetector
 from src.gesture_detectors.scale_gesture_detector import ScaleDetector
+from src.gesture_detectors.screenshot_gesture import ScreenshotDetector
 from src.gesture_handler import GestureHandler
 
 if __name__ == "__main__":
@@ -37,7 +38,7 @@ if __name__ == "__main__":
 
     sender = DataSender()
 
-    gesture_handler = GestureHandler([CameraPanDetector(), ScaleDetector(), RotateDetector(), RotateZDetector(), ResetViewDetector()])
+    gesture_handler = GestureHandler([CameraPanDetector(), ScaleDetector(), ScreenshotDetector(), RotateDetector(), RotateZDetector(), ResetViewDetector()])
 
 
     while cap.isOpened():

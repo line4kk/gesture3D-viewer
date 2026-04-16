@@ -8,8 +8,9 @@ public class AccumulatedData {
     private final double dyCameraPan;
     private final double deltaScale;
     private final boolean resetView;
+    private final boolean screenshot;
 
-    public AccumulatedData(double degreesX, double degreesY, double degreesZ, double dxCameraPan, double dyCameraPan, double deltaScale, boolean resetView) {
+    public AccumulatedData(double degreesX, double degreesY, double degreesZ, double dxCameraPan, double dyCameraPan, double deltaScale, boolean resetView, boolean screenshot) {
         this.degreesX = degreesX;
         this.degreesY = degreesY;
         this.degreesZ = degreesZ;
@@ -17,6 +18,7 @@ public class AccumulatedData {
         this.dyCameraPan = dyCameraPan;
         this.deltaScale = deltaScale;
         this.resetView = resetView;
+        this.screenshot = screenshot;
     }
 
     public double getDegreesY() {
@@ -43,8 +45,11 @@ public class AccumulatedData {
         return dxCameraPan;
     }
 
-    public boolean getResetView() {
+    public boolean isResetView() {
         return resetView;
     }
 
+    public boolean isScreenshot() {
+        return screenshot;
+    }
 }

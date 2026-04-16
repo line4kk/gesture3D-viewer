@@ -79,4 +79,9 @@ public class SceneController {
         camera.setTranslateZ(-450);
     }
 
+    public void changeCubeColorToRed() {
+        if (model instanceof Shape3D shape) {
+            shape.setMaterial(new PhongMaterial(Color.RED));
+        }
+    }
 }
