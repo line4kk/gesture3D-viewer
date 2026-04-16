@@ -33,5 +33,8 @@ class DataSender:
             self.socket.close()
             self.context.term()
 
+    def __del__(self):
+        self.close()
+
 class DataSenderException(Exception):
     pass

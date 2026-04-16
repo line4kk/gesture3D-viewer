@@ -9,15 +9,6 @@ from src.gesture_detectors.rotate_detector import RotateDetector
 from src.gesture_detectors.scale_gesture_detector import ScaleDetector
 from src.gesture_handler import GestureHandler
 
-#logging.basicConfig(level=logging.DEBUG)
-
-prev_x = -1
-prev_y = -1
-sumdx = 0
-sumdy = 0
-
-pockets = 0
-time_to_sending = 0
 if __name__ == "__main__":
 
     VisionRunningMode = mp.tasks.vision.RunningMode
@@ -46,7 +37,6 @@ if __name__ == "__main__":
 
     gesture_handler = GestureHandler([CameraPanDetector(), ScaleDetector(), RotateDetector()])
 
-    i = 0
 
     while cap.isOpened():
         ret, frame = cap.read()
@@ -64,10 +54,9 @@ if __name__ == "__main__":
         )
         for hand_landmarks in results.hand_landmarks:
             for idx, landmark in enumerate(hand_landmarks):
-                #if idx < 5:
-                    x = int(landmark.x * frame.shape[1])
-                    y = int(landmark.y * frame.shape[0])
-                    cv2.circle(frame, (x, y), 4, (255, 0, 0), -1)
+                x = int(landmark.x * frame.shape[1])
+                y = int(landmark.y * frame.shape[0])
+                cv2.circle(frame, (x, y), 4, (255, 0, 0), -1)
 
         result_data = gesture_handler.handle(results)
         if result_data:
@@ -77,7 +66,7 @@ if __name__ == "__main__":
 
         if cv2.waitKey(1) & 0xFF == 27:
             break
-        i += 1
+
     cap.release()
     cv2.destroyAllWindows()
     sender.close()
