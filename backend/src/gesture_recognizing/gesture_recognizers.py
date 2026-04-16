@@ -33,9 +33,9 @@ def is_photo_gesture(rcg_result: GestureRecognizerResult):
     if not is_L_gesture(rcg_result, 0) or not is_L_gesture(rcg_result, 1):
         return False
 
-    if not is_index_parallel_to_ox(hand1_landmarks) or not is_index_parallel_to_ox(hand2_landmarks):
+    if not is_index_parallel_to(hand1_landmarks, np.array([1, 0, 0])) or not is_index_parallel_to(hand2_landmarks, np.array([1, 0, 0])):
         return False
-    if not is_thumb_normal_to_ox(hand1_landmarks, 30) or not is_thumb_normal_to_ox(hand2_landmarks, 30):
+    if not is_thumb_normal_to(hand1_landmarks, np.array([1, 0, 0])) or not is_thumb_normal_to(hand2_landmarks, np.array([1, 0, 0])):
         return False
     if not is_tips_close(rcg_result.hand_landmarks, 2):
         return False

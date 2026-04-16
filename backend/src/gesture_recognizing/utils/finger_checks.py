@@ -73,7 +73,7 @@ def is_finger_curled(landmarks: List[NormalizedLandmark], finger, max_angle_betw
 
     return result
 
-def is_index_parallel_to_ox(landmarks: List[NormalizedLandmark], max_deviation_angle=20):
+def is_index_parallel_to(landmarks: List[NormalizedLandmark], vector: np.ndarray, max_deviation_angle=20):
     if not is_finger_straight(landmarks, 1):
         return False
 
@@ -82,11 +82,10 @@ def is_index_parallel_to_ox(landmarks: List[NormalizedLandmark], max_deviation_a
 
     index_vector = to_np_vector(mcp, tip)
     index_vector[2] = 0  # Проекция на xOy
-    ox_vector = np.array([1, 0, 0])
 
-    return is_parallel(index_vector, ox_vector, max_deviation_angle)
+    return is_parallel(index_vector, vector, max_deviation_angle)
 
-def is_thumb_normal_to_ox(landmarks: List[NormalizedLandmark], max_deviation_angle=15):
+def is_thumb_normal_to(landmarks: List[NormalizedLandmark], vector: np.ndarray, max_deviation_angle=30):
     if not is_thumb_straight(landmarks):
         return False
 
@@ -95,9 +94,9 @@ def is_thumb_normal_to_ox(landmarks: List[NormalizedLandmark], max_deviation_ang
 
     thumb_vector = to_np_vector(cmc, tip)
     thumb_vector[2] = 0
-    ox_vector = np.array([1, 0, 0])
 
-    return is_normal(thumb_vector, ox_vector, max_deviation_angle)
+    return is_normal(thumb_vector, vector, max_deviation_angle)
+
 
 
 def is_tips_close(landmarks: List[List[NormalizedLandmark]], max_distance_coefficient=1):
