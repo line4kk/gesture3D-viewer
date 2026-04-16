@@ -46,3 +46,9 @@ def is_normal(v1, v2, max_angle_deviation=15):
 
 def distance(dot1, dot2):
     return np.linalg.norm(to_np_vector(dot1, dot2))
+
+def is_codirectional(v1, v2, max_angle_deviation=15):
+    cos_similarity = count_cos_similarity(v1, v2)
+    threshold = np.cos(np.deg2rad(max_angle_deviation))
+
+    return cos_similarity >= threshold

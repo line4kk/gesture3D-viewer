@@ -85,6 +85,9 @@ public class Application extends javafx.application.Application {
                 if (accumulatedData.getDeltaScale() != 0) {
                     controller.changeCameraScaleBy(accumulatedData.getDeltaScale());
                 }
+                if (accumulatedData.getResetView()) {
+                    controller.resetView();
+                }
             }
         };
 

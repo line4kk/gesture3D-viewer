@@ -5,6 +5,7 @@ from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.vision import GestureRecognizerOptions
 
 from src.gesture_detectors.camera_pan_detector import CameraPanDetector
+from src.gesture_detectors.reset_view_detector import ResetViewDetector
 from src.gesture_detectors.rotate_detector import RotateDetector
 from src.gesture_detectors.rotate_z_detector import RotateZDetector
 from src.gesture_detectors.scale_gesture_detector import ScaleDetector
@@ -36,7 +37,7 @@ if __name__ == "__main__":
 
     sender = DataSender()
 
-    gesture_handler = GestureHandler([CameraPanDetector(), ScaleDetector(), RotateDetector(), RotateZDetector()])
+    gesture_handler = GestureHandler([CameraPanDetector(), ScaleDetector(), RotateDetector(), RotateZDetector(), ResetViewDetector()])
 
 
     while cap.isOpened():

@@ -42,3 +42,21 @@ def is_photo_gesture(rcg_result: GestureRecognizerResult):
 
 
     return True
+
+def is_here_gesture(rcg_result: GestureRecognizerResult, hand_ind=0):
+    if not rcg_result.hand_landmarks:
+        return False
+
+    hand_landmarks = rcg_result.hand_landmarks[hand_ind]
+    score = 0
+
+    if is_finger_straight(hand_landmarks, 1):
+        score += 1
+
+    for finger in range(2, 5):
+        if is_finger_curled(hand_landmarks, finger):
+            score += 0.5
+
+    result = score == 2.5
+
+    return result

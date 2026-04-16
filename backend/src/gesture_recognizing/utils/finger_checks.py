@@ -2,7 +2,7 @@ from typing import List
 
 from mediapipe.tasks.python.components.containers.landmark import NormalizedLandmark
 from src.gesture_recognizing.utils.geometry import landmark_to_np_point, angle, to_np_vector, is_parallel, is_normal, \
-    distance, landmark_to_xOy_projection
+    distance, landmark_to_xOy_projection, is_codirectional
 import numpy as np
 
 
@@ -93,10 +93,21 @@ def is_thumb_normal_to(landmarks: List[NormalizedLandmark], vector: np.ndarray, 
     tip = landmark_to_np_point(landmarks[4])
 
     thumb_vector = to_np_vector(cmc, tip)
-    thumb_vector[2] = 0
+    thumb_vector[2] = 0  # Проекция на xOy
 
     return is_normal(thumb_vector, vector, max_deviation_angle)
 
+def is_index_codirectional(landmarks: List[NormalizedLandmark], vector: np.ndarray, max_deviation_angle=20):
+    if not is_finger_straight(landmarks, 1):
+        return False
+
+    mcp = landmark_to_np_point(landmarks[5])
+    tip = landmark_to_np_point(landmarks[8])
+
+    index_vector = to_np_vector(mcp, tip)
+    index_vector[2] = 0  # Проекция на xOy
+
+    return is_codirectional(index_vector, vector, max_deviation_angle)
 
 
 def is_tips_close(landmarks: List[List[NormalizedLandmark]], max_distance_coefficient=1):

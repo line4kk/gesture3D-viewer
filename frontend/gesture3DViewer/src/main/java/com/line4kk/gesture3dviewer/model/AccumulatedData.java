@@ -1,40 +1,26 @@
 package com.line4kk.gesture3dviewer.model;
 
 public class AccumulatedData {
-    private double degreesX;
-    private double degreesY;
-    private double degreesZ;
-    private double dxCameraPan;
-    private double dyCameraPan;
-    private double deltaScale;
+    private final double degreesX;
+    private final double degreesY;
+    private final double degreesZ;
+    private final double dxCameraPan;
+    private final double dyCameraPan;
+    private final double deltaScale;
+    private final boolean resetView;
 
-    public AccumulatedData(double degreesX, double degreesY, double degreesZ, double dxCameraPan, double dyCameraPan, double deltaScale) {
+    public AccumulatedData(double degreesX, double degreesY, double degreesZ, double dxCameraPan, double dyCameraPan, double deltaScale, boolean resetView) {
         this.degreesX = degreesX;
         this.degreesY = degreesY;
         this.degreesZ = degreesZ;
         this.dxCameraPan = dxCameraPan;
         this.dyCameraPan = dyCameraPan;
         this.deltaScale = deltaScale;
+        this.resetView = resetView;
     }
 
     public double getDegreesY() {
         return degreesY;
-    }
-
-    public void setDegreesX(double degreesX) {
-        this.degreesX = degreesX;
-    }
-
-    public void setDegreesY(double degreesY) {
-        this.degreesY = degreesY;
-    }
-
-    public void setDegreesZ(double degreesZ) {
-        this.degreesZ = degreesZ;
-    }
-
-    public void setDeltaScale(double deltaScale) {
-        this.deltaScale = deltaScale;
     }
 
     public double getDegreesX() {
@@ -53,15 +39,12 @@ public class AccumulatedData {
         return dyCameraPan;
     }
 
-    public void setDyCameraPan(double dyCameraPan) {
-        this.dyCameraPan = dyCameraPan;
-    }
-
     public double getDxCameraPan() {
         return dxCameraPan;
     }
 
-    public void setDxCameraPan(double dxCameraPan) {
-        this.dxCameraPan = dxCameraPan;
+    public boolean getResetView() {
+        return resetView;
     }
+
 }

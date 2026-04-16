@@ -11,6 +11,7 @@ public class Accumulator {
     private double dxCameraPan = 0.0;
     private double dyCameraPan = 0.0;
     private double deltaScale = 0.0;
+    private boolean resetView = false;
 
     public synchronized void accumulate(GestureMessage message) {
         switch (message.type) {
@@ -28,17 +29,21 @@ public class Accumulator {
             case "camera_scale":
                 deltaScale += message.dr * SensitivitySettings.cameraScaleSensitivity;
                 break;
+            case "reset_view":
+                resetView = true;
+                break;
         }
     }
 
     public synchronized AccumulatedData consume() {
-        AccumulatedData data = new AccumulatedData(degreesX, degreesY, degreesZ, dxCameraPan, dyCameraPan, deltaScale);
+        AccumulatedData data = new AccumulatedData(degreesX, degreesY, degreesZ, dxCameraPan, dyCameraPan, deltaScale, resetView);
         degreesX = 0.0;
         degreesY = 0.0;
         degreesZ = 0.0;
         dxCameraPan = 0.0;
         dyCameraPan = 0.0;
         deltaScale = 0.0;
+        resetView = false;
         return data;
     }
 
