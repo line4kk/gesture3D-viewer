@@ -10,8 +10,8 @@ from src.gesture_detectors.camera_pan_detector import CameraPanDetector
 from src.gesture_detectors.rotate_detector import RotateDetector
 from src.gesture_detectors.scale_gesture_detector import ScaleDetector
 from src.gesture_handler import GestureHandler
-from src.gesture_recognizers import is_L_gesture
-from src import gesture_recognizers
+from src.gesture_recognizing import is_L_gesture
+from src import gesture_recognizing
 
 #logging.basicConfig(level=logging.DEBUG)
 
@@ -73,16 +73,10 @@ if __name__ == "__main__":
                     x = int(landmark.x * frame.shape[1])
                     y = int(landmark.y * frame.shape[0])
                     cv2.circle(frame, (x, y), 4, (255, 0, 0), -1)
-        #print(is_L_gesture(results))
-        if results.gestures:
-            if is_L_gesture(results):
-                cv2.imwrite(f"imgs\\{i} - {gesture_recognizers.error}.png", frame)
-                debug_file.write(f"{i}: {gesture_recognizers.detail_error}\n\n")
 
         result_data = gesture_handler.handle(results)
         if result_data:
             sender.send(result_data)
-
 
         cv2.imshow("Gesture Recognition", frame)
 
