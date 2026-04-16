@@ -3,15 +3,11 @@ import cv2
 import mediapipe as mp
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.vision import GestureRecognizerOptions
-import logging
-import time
 
 from src.gesture_detectors.camera_pan_detector import CameraPanDetector
 from src.gesture_detectors.rotate_detector import RotateDetector
 from src.gesture_detectors.scale_gesture_detector import ScaleDetector
 from src.gesture_handler import GestureHandler
-from src.gesture_recognizing import is_L_gesture
-from src import gesture_recognizing
 
 #logging.basicConfig(level=logging.DEBUG)
 
@@ -52,7 +48,6 @@ if __name__ == "__main__":
 
     i = 0
 
-    debug_file = open("imgs\\debug.txt", "w")
     while cap.isOpened():
         ret, frame = cap.read()
 
@@ -86,7 +81,6 @@ if __name__ == "__main__":
     cap.release()
     cv2.destroyAllWindows()
     sender.close()
-    debug_file.close()
 
 
 

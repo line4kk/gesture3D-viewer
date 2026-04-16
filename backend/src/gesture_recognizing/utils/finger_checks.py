@@ -1,7 +1,10 @@
 from typing import List
 
 from mediapipe.tasks.python.components.containers.landmark import NormalizedLandmark
-from src.gesture_recognizing.utils.geometry import landmark_to_np_point, angle
+from src.gesture_recognizing.utils.geometry import landmark_to_np_point, angle, to_np_vector, is_parallel, is_normal, \
+    distance, landmark_to_xOy_projection
+import numpy as np
+
 
 def validate_finger_number(finger):
     if finger < 1 or finger > 4 or not isinstance(finger, int):
@@ -69,3 +72,49 @@ def is_finger_curled(landmarks: List[NormalizedLandmark], finger, max_angle_betw
     result = angle123 <= max_angle_between
 
     return result
+
+def is_index_parallel_to_ox(landmarks: List[NormalizedLandmark], max_deviation_angle=20):
+    if not is_finger_straight(landmarks, 1):
+        return False
+
+    mcp = landmark_to_np_point(landmarks[5])
+    tip = landmark_to_np_point(landmarks[8])
+
+    index_vector = to_np_vector(mcp, tip)
+    index_vector[2] = 0  # Проекция на xOy
+    ox_vector = np.array([1, 0, 0])
+
+    return is_parallel(index_vector, ox_vector, max_deviation_angle)
+
+def is_thumb_normal_to_ox(landmarks: List[NormalizedLandmark], max_deviation_angle=15):
+    if not is_thumb_straight(landmarks):
+        return False
+
+    cmc = landmark_to_np_point(landmarks[1])
+    tip = landmark_to_np_point(landmarks[4])
+
+    thumb_vector = to_np_vector(cmc, tip)
+    thumb_vector[2] = 0
+    ox_vector = np.array([1, 0, 0])
+
+    return is_normal(thumb_vector, ox_vector, max_deviation_angle)
+
+
+def is_tips_close(landmarks: List[List[NormalizedLandmark]], max_distance_coefficient=1):
+    hand1_landmarks = landmarks[0]
+    hand2_landmarks = landmarks[1]
+
+    index1_tip = landmark_to_xOy_projection(hand1_landmarks[8])
+    index2_tip = landmark_to_xOy_projection(hand2_landmarks[8])
+    index1_ip = landmark_to_xOy_projection(hand1_landmarks[7])
+    index2_ip = landmark_to_xOy_projection(hand2_landmarks[7])
+    thumb1_tip = landmark_to_xOy_projection(hand1_landmarks[4])
+    thumb2_tip = landmark_to_xOy_projection(hand2_landmarks[4])
+
+    max_distance1 = distance(index1_tip, index1_ip) * max_distance_coefficient
+    max_distance2 = distance(index2_tip, index2_ip) * max_distance_coefficient
+
+    distance1 = distance(index1_tip, thumb2_tip)
+    distance2 = distance(index2_tip, thumb1_tip)
+
+    return distance1 <= max_distance1 and distance2 <= max_distance2
