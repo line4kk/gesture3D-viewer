@@ -18,12 +18,16 @@ public class Accumulator {
                 degreesX += message.dy * SensitivitySettings.rotateSensitivity;
                 degreesY += message.dx * SensitivitySettings.rotateSensitivity;
                 break;
+            case "rotate_z":
+                degreesZ += message.dz * SensitivitySettings.rotateSensitivity;
+                break;
             case "camera_pan":
                 dxCameraPan += message.dx * SensitivitySettings.cameraPanSensitivity;
                 dyCameraPan += message.dy * -SensitivitySettings.cameraPanSensitivity;
                 break;
             case "camera_scale":
                 deltaScale += message.dr * SensitivitySettings.cameraScaleSensitivity;
+                break;
         }
     }
 
