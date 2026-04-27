@@ -7,7 +7,7 @@ from src.gesture_recognizing.gesture_recognizers import is_photo_gesture
 
 
 class ScreenshotDetector(GestureDetector):
-    def __init__(self, error=0.01, latency=1):
+    def __init__(self, error=0.05, latency=1):
         self.__type = "screenshot"
         self.__latency = latency
         self.__error = error

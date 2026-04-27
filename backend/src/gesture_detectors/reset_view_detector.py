@@ -12,7 +12,7 @@ from src.gesture_recognizing.utils.hand_checks import is_hands_parallel_to
 
 
 class ResetViewDetector(GestureDetector):
-    def __init__(self, error=0.01, latency=1):
+    def __init__(self, error=0.05, latency=1):
         self.__type = "reset_view"
         self.__latency = latency
         self.__error = error
