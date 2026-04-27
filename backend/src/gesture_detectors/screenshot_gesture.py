@@ -2,8 +2,8 @@ import time
 
 from mediapipe.tasks.python.vision.gesture_recognizer_result import GestureRecognizerResult
 
-from src.gesture_detectors.base_gesture_detector import GestureDetector
-from src.gesture_recognizing.gesture_recognizers import is_photo_gesture
+from .base_gesture_detector import GestureDetector
+from ..gesture_recognizing.gesture_recognizers import is_photo_gesture
 
 
 class ScreenshotDetector(GestureDetector):

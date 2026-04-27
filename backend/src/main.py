@@ -1,27 +1,29 @@
-from datasender import DataSender
+from pathlib import Path
+
 import cv2
 import mediapipe as mp
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.vision import GestureRecognizerOptions
 
-from src.gesture_detectors.camera_pan_detector import CameraPanDetector
-from src.gesture_detectors.reset_view_detector import ResetViewDetector
-from src.gesture_detectors.rotate_detector import RotateDetector
-from src.gesture_detectors.rotate_z_detector import RotateZDetector
-from src.gesture_detectors.scale_gesture_detector import ScaleDetector
-from src.gesture_detectors.screenshot_gesture import ScreenshotDetector
-from src.gesture_handler import GestureHandler
+from .datasender import DataSender
+from .gesture_detectors.camera_pan_detector import CameraPanDetector
+from .gesture_detectors.reset_view_detector import ResetViewDetector
+from .gesture_detectors.rotate_detector import RotateDetector
+from .gesture_detectors.rotate_z_detector import RotateZDetector
+from .gesture_detectors.scale_gesture_detector import ScaleDetector
+from .gesture_detectors.screenshot_gesture import ScreenshotDetector
+from .gesture_handler import GestureHandler
 
 if __name__ == "__main__":
 
     VisionRunningMode = mp.tasks.vision.RunningMode
     BaseOptions = mp.tasks.BaseOptions
 
-    # Путь к модели — путь до скачанного файла gesture_recognizer.task
-    MODEL_PATH = "../resources/models/gesture_recognizer.task"
+    # Путь к модели относительно директории backend.
+    MODEL_PATH = Path(__file__).resolve().parents[1] / "resources" / "models" / "gesture_recognizer.task"
 
     # Настройки
-    base_options = BaseOptions(model_asset_path=MODEL_PATH)
+    base_options = BaseOptions(model_asset_path=str(MODEL_PATH))
     options = GestureRecognizerOptions(
         base_options=base_options,
         running_mode=VisionRunningMode.VIDEO,

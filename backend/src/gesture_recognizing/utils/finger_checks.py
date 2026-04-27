@@ -1,7 +1,7 @@
 from typing import List
 
 from mediapipe.tasks.python.components.containers.landmark import NormalizedLandmark
-from src.gesture_recognizing.utils.geometry import landmark_to_np_point, angle, to_np_vector, is_parallel, is_normal, \
+from .geometry import landmark_to_np_point, angle, to_np_vector, is_parallel, is_normal, \
     distance, landmark_to_xOy_projection, is_codirectional
 import numpy as np
 

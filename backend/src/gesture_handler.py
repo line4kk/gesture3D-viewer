@@ -2,7 +2,7 @@ from typing import List
 
 from mediapipe.tasks.python.vision.gesture_recognizer_result import GestureRecognizerResult
 
-from src.gesture_detectors.base_gesture_detector import GestureDetector
+from .gesture_detectors.base_gesture_detector import GestureDetector
 
 
 class GestureHandler:

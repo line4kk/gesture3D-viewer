@@ -1,7 +1,7 @@
 from typing import List
 
 from mediapipe.tasks.python.components.containers.landmark import NormalizedLandmark
-from src.gesture_recognizing.utils.geometry import landmark_to_np_point, to_np_vector, is_parallel
+from .geometry import landmark_to_np_point, to_np_vector, is_parallel
 
 
 def is_hands_parallel_to(landmarks: List[List[NormalizedLandmark]], vector, max_deviation_angle=10):

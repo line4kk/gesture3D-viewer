@@ -2,13 +2,13 @@ import time
 
 from mediapipe.tasks.python.vision.gesture_recognizer_result import GestureRecognizerResult
 
-from src.gesture_detectors.base_gesture_detector import GestureDetector
-from src.gesture_recognizing.gesture_recognizers import is_here_gesture
-from src.gesture_recognizing.utils.finger_checks import is_index_codirectional
+from .base_gesture_detector import GestureDetector
+from ..gesture_recognizing.gesture_recognizers import is_here_gesture
+from ..gesture_recognizing.utils.finger_checks import is_index_codirectional
 
 import numpy as np
 
-from src.gesture_recognizing.utils.hand_checks import is_hands_parallel_to
+from ..gesture_recognizing.utils.hand_checks import is_hands_parallel_to
 
 
 class ResetViewDetector(GestureDetector):

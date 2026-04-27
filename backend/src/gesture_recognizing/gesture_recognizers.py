@@ -1,6 +1,6 @@
 from mediapipe.tasks.python.vision.gesture_recognizer_result import GestureRecognizerResult
 
-from src.gesture_recognizing.utils.finger_checks import *
+from .utils.finger_checks import *
 
 def is_L_gesture(rcg_result: GestureRecognizerResult, hand_ind=0):
     if not rcg_result.hand_landmarks:
