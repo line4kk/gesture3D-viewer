@@ -65,8 +65,13 @@ if __name__ == "__main__":
 
         result_data = gesture_handler.handle(results)
         if result_data:
-            sender.send(result_data)
+            sender.send(result_data.get_packet())
 
+        cv2.putText(
+            frame,
+            f"{gesture_handler.get_last_pose().pose_label if gesture_handler.get_last_pose() else None}",
+            (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2
+        )
         cv2.imshow("Gesture Recognition", frame)
 
         if cv2.waitKey(1) & 0xFF == 27:

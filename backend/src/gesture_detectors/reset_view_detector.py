@@ -3,17 +3,19 @@ import time
 from mediapipe.tasks.python.vision.gesture_recognizer_result import GestureRecognizerResult
 
 from .base_gesture_detector import GestureDetector
+from .gesture_detector_result import GestureDetectorResult
 from ..gesture_recognizing.gesture_recognizers import is_here_gesture
 from ..utils.finger_checks import is_index_codirectional
 
 import numpy as np
 
-from src.utils.hand_checks import is_hands_parallel_to
+from ..utils.hand_checks import is_hands_parallel_to
 
 
 class ResetViewDetector(GestureDetector):
     def __init__(self, error=0.05, latency=1):
         self.__type = "reset_view"
+        self.__pose_label = "\"Here\" gesture"
         self.__latency = latency
         self.__error = error
 
@@ -37,16 +39,15 @@ class ResetViewDetector(GestureDetector):
         self.__is_detected = False
 
     def detect(self, rcg_results: GestureRecognizerResult, hand_idx=0):
-        detected = {}
         if self.__is_detected:
             self.reset_state()
-            return {}
+            return None
         if len(rcg_results.gestures) != 2:
             self.reset_state()
-            return {}
+            return None
         if not is_here_gesture(rcg_results,0) or not is_here_gesture(rcg_results, 1):
             self.reset_state()
-            return {}
+            return None
 
         hand1_landmarks = rcg_results.hand_landmarks[0]
         hand2_landmarks = rcg_results.hand_landmarks[1]
@@ -55,14 +56,14 @@ class ResetViewDetector(GestureDetector):
         # Проверяем приблизительную сонаправленность указательного пальца и оси OY
         if not is_index_codirectional(hand1_landmarks, OY) or not is_index_codirectional(hand2_landmarks, OY):
             self.reset_state()
-            return {}
+            return None
 
 
         OX = np.array([1, 0, 0])
         # Проверяем, что руки находятся на одном уровне
         if not is_hands_parallel_to(rcg_results.hand_landmarks, OX):
             self.reset_state()
-            return {}
+            return None
 
         first_hand_wrist = hand1_landmarks[0]
         second_hand_wrist = hand2_landmarks[0]
@@ -87,9 +88,8 @@ class ResetViewDetector(GestureDetector):
         else:
             current_time = time.monotonic()
             if current_time - self.__start_time >= self.__latency:
-                detected["type"] = self.__type
                 self.__is_detected = True
 
 
 
-        return detected
+        return GestureDetectorResult(self.__type, {}, self.__pose_label)

@@ -1,6 +1,7 @@
 from mediapipe.tasks.python.vision.gesture_recognizer_result import GestureRecognizerResult
 
 from .base_gesture_detector import GestureDetector
+from .gesture_detector_result import GestureDetectorResult
 
 import numpy as np
 
@@ -12,6 +13,7 @@ class CameraPanDetector(GestureDetector):
         self.__second_hand_prev_x = None
         self.__second_hand_prev_y = None
         self.__type = "camera_pan"
+        self.__pose_label = "Two open palms"
 
         self.__is_detected = False
 
@@ -26,13 +28,12 @@ class CameraPanDetector(GestureDetector):
         self.__is_detected = False
 
     def detect(self, rcg_results: GestureRecognizerResult, hand_idx=0):
-        detected = {}
         if len(rcg_results.gestures) != 2:
             self.reset_state()
-            return {}
+            return None
         if rcg_results.gestures[0][0].category_name != "Open_Palm" or rcg_results.gestures[1][0].category_name != "Open_Palm":
             self.reset_state()
-            return {}
+            return None
 
         is_first_frame = False
         if (not self.__first_hand_prev_x or not self.__first_hand_prev_y
@@ -43,7 +44,7 @@ class CameraPanDetector(GestureDetector):
         first_hand_y = rcg_results.hand_landmarks[0][0].y
         second_hand_x = rcg_results.hand_landmarks[1][0].x
         second_hand_y = rcg_results.hand_landmarks[1][0].y
-
+        payload = {}
         if not is_first_frame:
             first_hand_vector = np.array([first_hand_x - self.__first_hand_prev_x,
                                           first_hand_y - self.__first_hand_prev_y],
@@ -58,9 +59,8 @@ class CameraPanDetector(GestureDetector):
                 is_first_frame = True
             else:
                 shortest_vector = first_hand_vector if np.linalg.norm(first_hand_vector) < np.linalg.norm(second_hand_vector) else second_hand_vector
-                detected["type"] = self.__type
-                detected["dx"] = shortest_vector[0]
-                detected["dy"] = shortest_vector[1]
+                payload["dx"] = shortest_vector[0]
+                payload["dy"] = shortest_vector[1]
 
         self.__first_hand_prev_x = first_hand_x
         self.__first_hand_prev_y = first_hand_y
@@ -69,4 +69,4 @@ class CameraPanDetector(GestureDetector):
 
 
         self.__is_detected = not is_first_frame
-        return detected
+        return GestureDetectorResult(self.__type, payload, self.__pose_label)
