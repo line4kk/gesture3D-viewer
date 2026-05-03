@@ -11,7 +11,7 @@ from .gesture_detectors.reset_view_detector import ResetViewDetector
 from .gesture_detectors.rotate_detector import RotateDetector
 from .gesture_detectors.rotate_z_detector import RotateZDetector
 from .gesture_detectors.scale_gesture_detector import ScaleDetector
-from .gesture_detectors.screenshot_gesture import ScreenshotDetector
+from .gesture_detectors.screenshot_gesture_detector import ScreenshotDetector
 from .gesture_handler import GestureHandler
 
 if __name__ == "__main__":
