@@ -54,6 +54,13 @@ public class Application extends javafx.application.Application {
             if (event.getCode() == KeyCode.BACK_SPACE) {
                 controller.resetView();
             }
+            if (event.getCode() == KeyCode.SPACE) {
+                controller.addCubeModel();
+            }
+            if (event.getCode() == KeyCode.ALT) {
+                controller.removeModel();
+            }
+
         });
 
         scene.setOnScroll(event -> {

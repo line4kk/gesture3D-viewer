@@ -5,34 +5,27 @@ import javafx.scene.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Box;
-import javafx.scene.shape.Shape3D;
+import javafx.scene.shape.*;
 import javafx.scene.transform.Rotate;
 
 public class SceneController {
 
     @FXML
     private Pane mainScene;
+    private Group world;
     private Node model;
     private Camera camera;
 
     @FXML
     public void initialize() {
         // JavaFX вызовет автоматически
-        Group world = new Group();  // "мир" на сцене - группа
-
-
-        model = new Box(100, 100, 100);  // Объект на сцене - куб (временно)
-
-        if (model instanceof Shape3D shape) {
-            shape.setMaterial(new PhongMaterial(Color.BLUE));
-        }
+        world = new Group();  // "мир" на сцене - группа
 
         AmbientLight ambientLight = new AmbientLight(Color.color(0.2, 0.2, 0.2));
         PointLight pointLight = new PointLight();
         pointLight.setTranslateZ(-200);
 
-        world.getChildren().addAll(model, pointLight, ambientLight);
+        world.getChildren().addAll(pointLight, ambientLight);
 
         SubScene scene3D = new SubScene(world, 700, 400, true, SceneAntialiasing.BALANCED);
 
@@ -50,15 +43,19 @@ public class SceneController {
     }
 
     public void rotateXYModelBy(double xAxis, double yAxis) {
-        if (xAxis != 0)
-            model.getTransforms().add(0, new Rotate(xAxis, Rotate.X_AXIS));
-        if (yAxis != 0)
-            model.getTransforms().add(0, new Rotate(yAxis, Rotate.Y_AXIS));
+        if (model != null) {
+            if (xAxis != 0)
+                model.getTransforms().addFirst(new Rotate(xAxis, Rotate.X_AXIS));
+            if (yAxis != 0)
+                model.getTransforms().addFirst(new Rotate(yAxis, Rotate.Y_AXIS));
+        }
     }
 
     public void rotateZModelBy(double zAxis) {
-        if (zAxis != 0)
-            model.getTransforms().add(0, new Rotate(zAxis, Rotate.Z_AXIS));
+        if (model != null) {
+            if (zAxis != 0)
+                model.getTransforms().addFirst(new Rotate(zAxis, Rotate.Z_AXIS));
+        }
     }
 
     public void moveCameraBy(double x, double y) {
@@ -83,5 +80,32 @@ public class SceneController {
         if (model instanceof Shape3D shape) {
             shape.setMaterial(new PhongMaterial(Color.RED));
         }
+    }
+
+    public void addCubeModel() {
+        model = new Box(100, 100, 100);  // Объект на сцене - куб (временно)
+
+        if (model instanceof Shape3D shape) {
+            shape.setMaterial(new PhongMaterial(Color.BLUE));
+        }
+
+        world.getChildren().add(model);
+    }
+
+    public void setModel(TriangleMesh mesh) {
+        if (model != null) {
+            removeModel();
+        }
+
+        MeshView meshView = new MeshView(mesh);
+        meshView.setMaterial(new PhongMaterial(Color.BLUE));
+
+        model = meshView;
+
+        world.getChildren().add(model);
+    }
+
+    public void removeModel() {
+        world.getChildren().remove(model);
     }
 }
