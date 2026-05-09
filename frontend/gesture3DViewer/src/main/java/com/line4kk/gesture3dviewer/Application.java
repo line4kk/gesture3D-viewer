@@ -3,9 +3,11 @@ package com.line4kk.gesture3dviewer;
 import com.line4kk.gesture3dviewer.model.AccumulatedData;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
+import org.lwjgl.assimp.AIScene;
 
 import java.io.IOException;
 
@@ -55,7 +57,11 @@ public class Application extends javafx.application.Application {
                 controller.resetView();
             }
             if (event.getCode() == KeyCode.SPACE) {
-                controller.addCubeModel();
+//                AIScene aiScene = AssetLoader.loadAsset("gesture3DViewer/src/main/resources/com/line4kk/gesture3dviewer/models/bugatti.obj");
+//                AIScene aiScene = AssetLoader.loadAsset("gesture3DViewer/src/main/resources/com/line4kk/gesture3dviewer/models/model_1.obj");
+                AIScene aiScene = AssetLoader.loadAsset("gesture3DViewer/src/main/resources/com/line4kk/gesture3dviewer/models/banjofrog.obj");
+                Group modelScene = MeshConverter.convertScene(aiScene);
+                controller.setModelScene(modelScene);
             }
             if (event.getCode() == KeyCode.ALT) {
                 controller.removeModel();
@@ -96,7 +102,7 @@ public class Application extends javafx.application.Application {
                     controller.resetView();
                 }
                 if (accumulatedData.isScreenshot()) {
-                    controller.changeCubeColorToRed();
+
                 }
             }
         };
