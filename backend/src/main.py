@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     sender = DataSender()
 
-    gesture_handler = GestureHandler([CameraPanDetector(), ScaleDetector(), ScreenshotDetector(), RotateDetector(), RotateZDetector(), ResetViewDetector()])
+    gesture_handler = GestureHandler([ScaleDetector(), CameraPanDetector(),  ScreenshotDetector(), RotateDetector(), RotateZDetector(), ResetViewDetector()])
 
 
     while cap.isOpened():
