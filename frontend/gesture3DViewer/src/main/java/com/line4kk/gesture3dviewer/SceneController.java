@@ -1,10 +1,10 @@
 package com.line4kk.gesture3dviewer;
 
+import com.line4kk.gesture3dviewer.model.ViewerSettings;
 import javafx.fxml.FXML;
 import javafx.scene.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.*;
 import javafx.scene.transform.Rotate;
 
@@ -13,7 +13,7 @@ public class SceneController {
     @FXML
     private Pane mainScene;
     private Group world;
-    private Node model;
+    private Group modelScene;
     private Camera camera;
 
     @FXML
@@ -23,7 +23,7 @@ public class SceneController {
 
         AmbientLight ambientLight = new AmbientLight(Color.color(0.2, 0.2, 0.2));
         PointLight pointLight = new PointLight();
-        pointLight.setTranslateZ(-200);
+        pointLight.setTranslateZ(-ViewerSettings.lightingRangeCoefficient * ViewerSettings.initBoundingBox);
 
         world.getChildren().addAll(pointLight, ambientLight);
 
@@ -43,18 +43,18 @@ public class SceneController {
     }
 
     public void rotateXYModelBy(double xAxis, double yAxis) {
-        if (model != null) {
+        if (modelScene != null) {
             if (xAxis != 0)
-                model.getTransforms().addFirst(new Rotate(xAxis, Rotate.X_AXIS));
+                modelScene.getTransforms().addFirst(new Rotate(xAxis, Rotate.X_AXIS));
             if (yAxis != 0)
-                model.getTransforms().addFirst(new Rotate(yAxis, Rotate.Y_AXIS));
+                modelScene.getTransforms().addFirst(new Rotate(yAxis, Rotate.Y_AXIS));
         }
     }
 
     public void rotateZModelBy(double zAxis) {
-        if (model != null) {
+        if (modelScene != null) {
             if (zAxis != 0)
-                model.getTransforms().addFirst(new Rotate(zAxis, Rotate.Z_AXIS));
+                modelScene.getTransforms().addFirst(new Rotate(zAxis, Rotate.Z_AXIS));
         }
     }
 
@@ -76,36 +76,17 @@ public class SceneController {
         camera.setTranslateZ(-450);
     }
 
-    public void changeCubeColorToRed() {
-        if (model instanceof Shape3D shape) {
-            shape.setMaterial(new PhongMaterial(Color.RED));
-        }
-    }
-
-    public void addCubeModel() {
-        model = new Box(100, 100, 100);  // Объект на сцене - куб (временно)
-
-        if (model instanceof Shape3D shape) {
-            shape.setMaterial(new PhongMaterial(Color.BLUE));
-        }
-
-        world.getChildren().add(model);
-    }
-
-    public void setModel(TriangleMesh mesh) {
-        if (model != null) {
+    public void setModelScene(Group scene) {
+        if (modelScene != null) {
             removeModel();
         }
 
-        MeshView meshView = new MeshView(mesh);
-        meshView.setMaterial(new PhongMaterial(Color.BLUE));
-
-        model = meshView;
-
-        world.getChildren().add(model);
+        modelScene = scene;
+        ModelSceneNormalizer.normalize(modelScene);
+        world.getChildren().add(modelScene);
     }
 
     public void removeModel() {
-        world.getChildren().remove(model);
+        world.getChildren().remove(modelScene);
     }
 }
