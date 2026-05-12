@@ -21,7 +21,7 @@ public class SceneController {
         // JavaFX вызовет автоматически
         world = new Group();  // "мир" на сцене - группа
 
-        AmbientLight ambientLight = new AmbientLight(Color.color(0.2, 0.2, 0.2));
+        AmbientLight ambientLight = new AmbientLight(Color.color(0.5, 0.5, 0.5));
         PointLight pointLight = new PointLight();
         pointLight.setTranslateZ(-ViewerSettings.lightingRangeCoefficient * ViewerSettings.initBoundingBox);
 
