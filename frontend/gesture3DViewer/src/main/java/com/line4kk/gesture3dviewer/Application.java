@@ -59,7 +59,8 @@ public class Application extends javafx.application.Application {
             if (event.getCode() == KeyCode.SPACE) {
 //                AIScene aiScene = AssetLoader.loadAsset("gesture3DViewer/src/main/resources/com/line4kk/gesture3dviewer/models/bugatti.obj");
 //                AIScene aiScene = AssetLoader.loadAsset("gesture3DViewer/src/main/resources/com/line4kk/gesture3dviewer/models/model_1.obj");
-                AIScene aiScene = AssetLoader.loadAsset("gesture3DViewer/src/main/resources/com/line4kk/gesture3dviewer/models/banjofrog.obj");
+//                AIScene aiScene = AssetLoader.loadAsset("gesture3DViewer/src/main/resources/com/line4kk/gesture3dviewer/models/banjofrog.obj");
+                AIScene aiScene = AssetLoader.loadAsset("gesture3DViewer/src/main/resources/com/line4kk/gesture3dviewer/models/mcqueen/mcqueen.obj");
                 Group modelScene = MeshConverter.convertScene(aiScene);
                 controller.setModelScene(modelScene);
             }

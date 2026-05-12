@@ -1,8 +1,11 @@
 package com.line4kk.gesture3dviewer;
 
 import javafx.scene.Group;
+import javafx.scene.image.Image;
+import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.CullFace;
 import javafx.scene.shape.MeshView;
+import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
 import javafx.scene.shape.TriangleMesh;
 
@@ -10,7 +13,7 @@ import java.nio.IntBuffer;
 
 public class MeshConverter {
     
-    private static Group convertMesh(AIMesh aiMesh) {
+    private static Group convertMesh(AIMesh aiMesh, PointerBuffer materials) {
         Group outMesh = new Group();
 
         int vertexCount = aiMesh.mNumVertices();
@@ -106,6 +109,11 @@ public class MeshConverter {
 
             MeshView meshView  = new MeshView(triangleMesh);
             meshView.setCullFace(CullFace.NONE);
+
+            AIMaterial aiMaterial = AIMaterial.create(materials.get(aiMesh.mMaterialIndex()));
+            PhongMaterial phongMaterial = convertMaterial(aiMaterial);
+            meshView.setMaterial(phongMaterial);
+
             outMesh.getChildren().add(meshView);
 
         }
@@ -121,6 +129,163 @@ public class MeshConverter {
         return outMesh;
     }
 
+    private static PhongMaterial convertMaterial(AIMaterial aiMaterial) {
+
+        PhongMaterial material = new PhongMaterial();
+
+        // 1. DIFFUSE COLOR
+        AIColor4D diffuse = AIColor4D.create();
+        int result = Assimp.aiGetMaterialColor(
+                aiMaterial,
+                Assimp.AI_MATKEY_COLOR_DIFFUSE,
+                Assimp.aiTextureType_NONE,
+                0,
+                diffuse
+        );
+
+        if (result == 0) {
+            material.setDiffuseColor(
+                    javafx.scene.paint.Color.color(
+                            diffuse.r(),
+                            diffuse.g(),
+                            diffuse.b(),
+                            diffuse.a()
+                    )
+            );
+        }
+
+        // 2. DIFFUSE TEXTURE
+        AIString path = AIString.calloc();
+
+        if (Assimp.aiGetMaterialTexture(
+                aiMaterial,
+                Assimp.aiTextureType_DIFFUSE,
+                0,
+                path,
+                (IntBuffer) null,
+                null,
+                null,
+                null,
+                null,
+                null
+        ) == 0) {
+
+            String texPath = path.dataString();
+            if (!texPath.isBlank()) {
+                try {
+                    java.io.File file = new java.io.File("gesture3DViewer/src/main/resources/com/line4kk/gesture3dviewer/models/mcqueen/" + texPath);
+                    Image img = new Image(file.toURI().toString());
+                    material.setDiffuseMap(img);
+
+                } catch (Exception ignored) {}
+            }
+        }
+
+        // 3. SPECULAR COLOR
+        AIColor4D specular = AIColor4D.create();
+
+        if (Assimp.aiGetMaterialColor(
+                aiMaterial,
+                Assimp.AI_MATKEY_COLOR_SPECULAR,
+                Assimp.aiTextureType_NONE,
+                0,
+                specular
+        ) == 0) {
+
+            material.setSpecularColor(
+                    javafx.scene.paint.Color.color(
+                            specular.r(),
+                            specular.g(),
+                            specular.b()
+                    )
+            );
+        }
+
+        // 4. SHININESS
+        float[] shininess = new float[1];
+        int[] count = new int[1];
+
+        if (Assimp.aiGetMaterialFloatArray(
+                aiMaterial,
+                Assimp.AI_MATKEY_SHININESS,
+                Assimp.aiTextureType_NONE,
+                0,
+                shininess,
+                count
+        ) == 0 && count[0] > 0) {
+
+            material.setSpecularPower(shininess[0]);
+        }
+
+        // 5. OPACITY
+        float[] opacity = new float[1];
+
+        if (Assimp.aiGetMaterialFloatArray(
+                aiMaterial,
+                Assimp.AI_MATKEY_OPACITY,
+                Assimp.aiTextureType_NONE,
+                0,
+                opacity,
+                count
+        ) == 0 && count[0] > 0) {
+
+            double o = opacity[0];
+
+            material.setDiffuseColor(
+                    material.getDiffuseColor().deriveColor(
+                            0, 1, 1, o
+                    )
+            );
+        }
+
+        // 6. NORMAL MAP (BUMP)
+        AIString normalPath = AIString.calloc();
+
+        if (Assimp.aiGetMaterialTexture(
+                aiMaterial,
+                Assimp.aiTextureType_NORMALS,
+                0,
+                normalPath,
+                (IntBuffer) null,
+                null,
+                null,
+                null,
+                null,
+                null
+        ) == 0) {
+
+            String texPath = normalPath.dataString();
+
+            if (!texPath.isBlank()) {
+                try {
+                    java.io.File file = new java.io.File("gesture3DViewer/src/main/resources/com/line4kk/gesture3dviewer/models/mcqueen/" + texPath);
+                    Image img = new Image(file.toURI().toString());
+
+                    material.setBumpMap(img);
+
+                } catch (Exception ignored) {}
+            }
+        }
+
+        // 7. EMISSIVE
+        AIColor4D emissive = AIColor4D.create();
+
+        if (Assimp.aiGetMaterialColor(
+                aiMaterial,
+                Assimp.AI_MATKEY_COLOR_EMISSIVE,
+                Assimp.aiTextureType_NONE,
+                0,
+                emissive
+        ) == 0) {
+
+            material.setSelfIlluminationMap(
+                    new javafx.scene.image.WritableImage(1, 1)
+            );
+        }
+
+        return material;
+    }
+
     public static Group convertScene(AIScene scene) {
         // Получить группу всей сцены модели
 
@@ -132,7 +297,7 @@ public class MeshConverter {
 
         for (int i = 0; i < scene.mNumMeshes(); i++) {
             AIMesh aiMesh = AIMesh.create(scene.mMeshes().get(i));
-            Group mesh = convertMesh(aiMesh);
+            Group mesh = convertMesh(aiMesh, scene.mMaterials());
             modelScene.getChildren().add(mesh);
         }
 
