@@ -6,6 +6,7 @@ module com.line4kk.gesture3dviewer {
     requires jdk.compiler;
     requires org.lwjgl.assimp;
     requires javafx.graphics;
+    requires atlantafx.base;
 
 
     exports com.line4kk.gesture3dviewer;

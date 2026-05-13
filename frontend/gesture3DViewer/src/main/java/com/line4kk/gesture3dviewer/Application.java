@@ -1,5 +1,6 @@
 package com.line4kk.gesture3dviewer;
 
+import atlantafx.base.theme.CupertinoLight;
 import com.line4kk.gesture3dviewer.model.AccumulatedData;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXMLLoader;
@@ -15,10 +16,11 @@ public class Application extends javafx.application.Application {
     private static SceneController controller;
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("main-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 700, 400);
+        FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("views/main-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 1000, 800);
         stage.setTitle("Gesture3D Viewer");
         stage.setScene(scene);
+        scene.getRoot().requestFocus();
 
         controller = fxmlLoader.getController();
         scene.setOnKeyPressed(event -> {
@@ -110,7 +112,10 @@ public class Application extends javafx.application.Application {
 
         timer.start();
 
+        Application.setUserAgentStylesheet(new CupertinoLight().getUserAgentStylesheet());
+
         stage.show();
+        stage.setMaximized(true);
     }
 
     public static SceneController getController() {
