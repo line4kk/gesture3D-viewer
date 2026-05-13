@@ -1,12 +1,20 @@
 package com.line4kk.gesture3dviewer;
 
 import com.line4kk.gesture3dviewer.model.ViewerSettings;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.*;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.*;
+import javafx.scene.transform.Affine;
 import javafx.scene.transform.Rotate;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+
+import java.io.IOException;
 
 public class SceneController {
 
@@ -15,6 +23,7 @@ public class SceneController {
     private Group world;
     private Group modelScene;
     private Camera camera;
+    private Affine modelSceneTransforms;
 
     @FXML
     public void initialize() {
@@ -42,19 +51,44 @@ public class SceneController {
         mainScene.getChildren().add(scene3D);
     }
 
+    @FXML
+    public void onCreateProjectBtnClicked(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/com/line4kk/gesture3dviewer/views/create-project-view.fxml")
+        );
+
+        Parent root = loader.load();
+
+        Stage stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.setTitle("Создать проект");
+
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.centerOnScreen();
+        stage.setResizable(false);
+
+        MenuItem item = (MenuItem) event.getSource();
+        Window owner = item.getParentPopup().getOwnerWindow();
+
+        stage.initOwner(owner);
+
+        stage.showAndWait();
+    }
+
+
     public void rotateXYModelBy(double xAxis, double yAxis) {
         if (modelScene != null) {
             if (xAxis != 0)
-                modelScene.getTransforms().addFirst(new Rotate(xAxis, Rotate.X_AXIS));
+                modelSceneTransforms.prepend(new Rotate(xAxis, Rotate.X_AXIS));
             if (yAxis != 0)
-                modelScene.getTransforms().addFirst(new Rotate(yAxis, Rotate.Y_AXIS));
+                modelSceneTransforms.prepend(new Rotate(yAxis, Rotate.Y_AXIS));
         }
     }
 
     public void rotateZModelBy(double zAxis) {
         if (modelScene != null) {
             if (zAxis != 0)
-                modelScene.getTransforms().addFirst(new Rotate(zAxis, Rotate.Z_AXIS));
+                modelSceneTransforms.prepend(new Rotate(zAxis, Rotate.Z_AXIS));
         }
     }
 
@@ -82,11 +116,22 @@ public class SceneController {
         }
 
         modelScene = scene;
+        modelSceneTransforms = new Affine();
+
         ModelSceneNormalizer.normalize(modelScene);
+        modelScene.getTransforms().addFirst(modelSceneTransforms);
         world.getChildren().add(modelScene);
     }
 
     public void removeModel() {
         world.getChildren().remove(modelScene);
+    }
+
+    public double[] getCameraCoordinates() {
+        return new double[] {camera.getTranslateX(), camera.getTranslateY(), camera.getTranslateZ()};
+    }
+
+    public Affine getModelSceneTransformsCopy() {
+        return new Affine(modelSceneTransforms);
     }
 }
