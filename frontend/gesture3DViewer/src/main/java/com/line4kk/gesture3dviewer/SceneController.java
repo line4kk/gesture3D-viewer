@@ -1,20 +1,34 @@
 package com.line4kk.gesture3dviewer;
 
 import com.line4kk.gesture3dviewer.model.ViewerSettings;
+import com.line4kk.gesture3dviewer.ui.FileTreeCell;
+import com.line4kk.gesture3dviewer.ui.ProjectTreeBuilder;
+import com.line4kk.gesture3dviewer.ui.ViewerProject;
+import com.line4kk.gesture3dviewer.ui.utils.UIChecks;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.*;
+import javafx.scene.control.*;
+import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Rotate;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import org.lwjgl.assimp.AIScene;
 
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.Optional;
 
 public class SceneController {
 
@@ -24,6 +38,17 @@ public class SceneController {
     private Group modelScene;
     private Camera camera;
     private Affine modelSceneTransforms;
+
+    @FXML
+    private TreeView<File> projectTree;
+    @FXML
+    private Button setModelSceneButton;
+    @FXML
+    private Button addFileToProjectButton;
+    @FXML
+    private Button deleteFileFromProjectButton;
+    @FXML
+    private Button reloadProjectTreeButton;
 
     @FXML
     public void initialize() {
@@ -49,6 +74,36 @@ public class SceneController {
         scene3D.setFill(Color.rgb(120, 191, 222));
 
         mainScene.getChildren().add(scene3D);
+
+        projectTree.setCellFactory(tv -> new FileTreeCell());
+        projectTree.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((_, _, newItem) -> {
+                    boolean isObjFile = newItem != null
+                            && newItem.getValue().isFile()
+                            && newItem.getValue().getName().endsWith(".obj");
+
+                    setModelSceneButton.setDisable(!isObjFile);
+                });
+        projectTree.rootProperty()
+                .addListener(obs -> reloadProjectTreeButton.setDisable(projectTree.getRoot() == null));
+        projectTree.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((_, _, newItem) -> addFileToProjectButton.setDisable(newItem == null));
+        projectTree.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((_, _, newItem) -> {
+                    boolean isConfigFile = newItem != null
+                            && newItem.getValue().isFile()
+                            && newItem.getValue().getName().equals("config.json");
+
+                    deleteFileFromProjectButton.setDisable(isConfigFile);
+                });
+    }
+
+    public void setProject(ViewerProject project) {
+        File projectFile = new File(project.getProjectFullPath().toUri());
+        projectTree.setRoot(ProjectTreeBuilder.buildTree(projectFile));
     }
 
     @FXML
@@ -73,6 +128,110 @@ public class SceneController {
         stage.initOwner(owner);
 
         stage.showAndWait();
+    }
+
+    @FXML
+    public void onExitBtnClicked() {
+        Platform.exit();
+    }
+
+    @FXML
+    public void onSetModelSceneBtnClicked() {
+        TreeItem<File> selectedItem = projectTree.getSelectionModel().getSelectedItem();
+        if (selectedItem == null)
+            return;
+
+        File file = selectedItem.getValue();
+        String path = file.getAbsolutePath();
+        AIScene aiScene = AssetLoader.loadAsset(path);
+        Group modelScene = MeshConverter.convertScene(aiScene);
+
+        setModelScene(modelScene);
+    }
+
+    @FXML
+    public void onReloadProjectBtnClicked() {
+        File currentProjectFile = projectTree.getRoot().getValue();
+        projectTree.setRoot(ProjectTreeBuilder.buildTree(currentProjectFile));
+    }
+
+    @FXML
+    public void onAddFileToProjectBtnClicked() {
+        // Получаем выбранный элемент в дереве
+        TreeItem<File> selectedItem = projectTree.getSelectionModel().getSelectedItem();
+        if (selectedItem == null) return;
+
+        // Определяем целевую директорию
+        // Если выбран файл — берём его родительскую папку
+        File targetDir = selectedItem.getValue().isDirectory()
+                ? selectedItem.getValue()
+                : selectedItem.getValue().getParentFile();
+
+        // Открываем проводник
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Выберите файл для добавления в проект");
+
+        File chosenFile = fileChooser.showOpenDialog(projectTree.getScene().getWindow());
+        if (chosenFile == null) return; // пользователь закрыл проводник
+
+        File destination = new File(targetDir, chosenFile.getName());
+
+        // Если файл с таким именем уже существует
+        if (destination.exists()) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                    "Файл «" + chosenFile.getName() + "» уже существует. Заменить?");
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isEmpty() || result.get() != ButtonType.OK) return;
+        }
+
+        try {
+            if (!destination.exists()) {
+                // Если выбран файл — добавляем в родительскую папку, иначе в саму папку
+                TreeItem<File> newItem = new TreeItem<>(destination);
+                TreeItem<File> parentItem = selectedItem.getValue().isDirectory()
+                        ? selectedItem
+                        : selectedItem.getParent();
+
+                parentItem.getChildren().add(newItem);
+                parentItem.setExpanded(true);
+
+                // Выделяем добавленный файл
+                projectTree.getSelectionModel().select(newItem);
+            }
+            Files.copy(chosenFile.toPath(), destination.toPath(),
+                    StandardCopyOption.REPLACE_EXISTING);
+
+
+        } catch (IOException e) {
+            UIChecks.showError("Не удалось скопировать файл: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    public void onDeleteFileFromProjectBtnClicked() {
+        TreeItem<File> selectedItem = projectTree.getSelectionModel().getSelectedItem();
+        if (selectedItem == null) return;
+
+        File file = selectedItem.getValue();
+
+        if (selectedItem.getParent() == null) {
+            UIChecks.showError("Нельзя удалить корневую папку проекта.");
+            return;
+        }
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                "Переместить «" + file.getName() + "» в корзину?");
+        alert.showAndWait().ifPresent(btn -> {
+            if (btn != ButtonType.OK) return;
+
+            boolean success = Desktop.getDesktop().moveToTrash(file);
+
+            if (success) {
+                selectedItem.getParent().getChildren().remove(selectedItem);
+            } else {
+                UIChecks.showError("Не удалось переместить файл в корзину.");
+            }
+        });
     }
 
 

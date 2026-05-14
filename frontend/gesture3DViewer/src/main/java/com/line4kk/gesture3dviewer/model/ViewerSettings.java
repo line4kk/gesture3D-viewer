@@ -5,5 +5,6 @@ public class ViewerSettings {
     public static double cameraPanSensitivity = 500;
     public static double cameraScaleSensitivity = 700;
     public static double initBoundingBox = 200;
+    public static double initCameraZ = -450;
     public static double lightingRangeCoefficient = 8;  // 2-10
 }
