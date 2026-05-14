@@ -107,6 +107,8 @@ public class Application extends javafx.application.Application {
                 if (accumulatedData.isScreenshot()) {
 
                 }
+
+                controller.getVideoReceiver().tick();
             }
         };
 

@@ -3,6 +3,7 @@ package com.line4kk.gesture3dviewer;
 import com.line4kk.gesture3dviewer.model.ViewerSettings;
 import com.line4kk.gesture3dviewer.ui.FileTreeCell;
 import com.line4kk.gesture3dviewer.ui.ProjectTreeBuilder;
+import com.line4kk.gesture3dviewer.ui.UserVideoReceiver;
 import com.line4kk.gesture3dviewer.ui.ViewerProject;
 import com.line4kk.gesture3dviewer.ui.utils.UIChecks;
 import javafx.application.Platform;
@@ -13,6 +14,7 @@ import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
@@ -49,6 +51,12 @@ public class SceneController {
     private Button deleteFileFromProjectButton;
     @FXML
     private Button reloadProjectTreeButton;
+    @FXML
+    private CheckBox showVideoCheckBox;
+    @FXML
+    private ImageView webcamView;
+
+    private UserVideoReceiver videoReceiver;
 
     @FXML
     public void initialize() {
@@ -99,6 +107,9 @@ public class SceneController {
 
                     deleteFileFromProjectButton.setDisable(isConfigFile);
                 });
+
+
+        videoReceiver = new UserVideoReceiver(webcamView);
     }
 
     public void setProject(ViewerProject project) {
@@ -232,6 +243,29 @@ public class SceneController {
                 UIChecks.showError("Не удалось переместить файл в корзину.");
             }
         });
+    }
+
+    @FXML
+    public void onShowVideoCheckBox() {
+        if (showVideoCheckBox.isSelected()) {
+            new Thread(() -> {
+                String reply = BackendRequester.send("START_CAMERA");
+                if ("OK".equals(reply)) {
+                    videoReceiver.start();
+                } else {
+                    Platform.runLater(() -> showVideoCheckBox.setSelected(false));
+                }
+            }).start();
+        } else {
+            new Thread(() -> {
+                BackendRequester.send("STOP_CAMERA");
+                videoReceiver.stop();
+            }).start();
+        }
+    }
+
+    public UserVideoReceiver getVideoReceiver() {
+        return videoReceiver;
     }
 
 
