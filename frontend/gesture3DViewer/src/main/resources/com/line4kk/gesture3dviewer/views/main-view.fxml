@@ -35,19 +35,25 @@
                   <Insets left="10.0" />
                </padding>
             </Label>
-            <Label text="0" />
+            <Label fx:id="handsNumLabel" text="0" />
             <Label text="Текущий жест:">
                <padding>
                   <Insets left="10.0" />
                </padding>
             </Label>
-            <Label text="None" />
+            <Label fx:id="currentPoseLabel" text="None" />
+            <Label text="FPS:">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Label>
+            <Label fx:id="fpsLabel" text="0" />
             <Label layoutX="124.0" layoutY="11.0" text="Объект:">
                <padding>
                   <Insets left="10.0" />
                </padding>
             </Label>
-            <Label layoutX="224.0" layoutY="11.0" text="не задан" />
+            <Label fx:id="objectFileLabel" layoutX="224.0" layoutY="11.0" text="не задан" />
          </children>
       </HBox>
    </bottom>
@@ -67,7 +73,7 @@
           </Menu>
           <Menu mnemonicParsing="false" text="Помощь">
             <items>
-              <MenuItem mnemonicParsing="false" text="О программе" />
+              <MenuItem mnemonicParsing="false" onAction="#onAboutProjectBtnClicked" text="О программе" />
             </items>
           </Menu>
         </menus>

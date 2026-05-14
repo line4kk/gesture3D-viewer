@@ -13,6 +13,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -56,6 +57,16 @@ public class SceneController {
     @FXML
     private ImageView webcamView;
 
+    @FXML
+    public Label objectFileLabel;
+    @FXML
+    public Label fpsLabel;
+    @FXML
+    public Label handsNumLabel;
+    @FXML
+    public Label currentPoseLabel;
+
+    private ViewerProject currentProject = null;
     private UserVideoReceiver videoReceiver;
 
     @FXML
@@ -115,6 +126,7 @@ public class SceneController {
     public void setProject(ViewerProject project) {
         File projectFile = new File(project.getProjectFullPath().toUri());
         projectTree.setRoot(ProjectTreeBuilder.buildTree(projectFile));
+        currentProject = project;
     }
 
     @FXML
@@ -128,6 +140,30 @@ public class SceneController {
         Stage stage = new Stage();
         stage.setScene(new Scene(root));
         stage.setTitle("Создать проект");
+
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.centerOnScreen();
+        stage.setResizable(false);
+
+        MenuItem item = (MenuItem) event.getSource();
+        Window owner = item.getParentPopup().getOwnerWindow();
+
+        stage.initOwner(owner);
+
+        stage.showAndWait();
+    }
+
+    @FXML
+    public void onAboutProjectBtnClicked(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/com/line4kk/gesture3dviewer/views/about-project-view.fxml")
+        );
+
+        Parent root = loader.load();
+
+        Stage stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.setTitle("О проекте");
 
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.centerOnScreen();
@@ -158,6 +194,7 @@ public class SceneController {
         Group modelScene = MeshConverter.convertScene(aiScene);
 
         setModelScene(modelScene);
+        objectFileLabel.setText(file.getName());
     }
 
     @FXML

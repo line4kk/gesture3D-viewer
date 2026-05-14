@@ -80,15 +80,20 @@ public class Application extends javafx.application.Application {
             }
         });
 
-        DataReceiver receiver = new DataReceiver();
-        Thread thread = new Thread(receiver);
-        thread.setDaemon(true);
-        thread.start();
+        RecognizeDataReceiver recognizeDataReceiver = new RecognizeDataReceiver();
+        Thread threadRcnz = new Thread(recognizeDataReceiver);
+        threadRcnz.setDaemon(true);
+        threadRcnz.start();
+
+        StatsReceiver statsReceiver = new StatsReceiver();
+        Thread threadStats = new Thread(statsReceiver);
+        threadStats.setDaemon(true);
+        threadStats.start();
 
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long l) {
-                AccumulatedData accumulatedData = receiver.getAccumulator().consume();
+                AccumulatedData accumulatedData = recognizeDataReceiver.getAccumulator().consume();
                 if (accumulatedData.getDegreesX() != 0 || accumulatedData.getDegreesY() != 0) {
                     controller.rotateXYModelBy(accumulatedData.getDegreesX(), accumulatedData.getDegreesY());
                 }
@@ -107,8 +112,14 @@ public class Application extends javafx.application.Application {
                 if (accumulatedData.isScreenshot()) {
 
                 }
-
                 controller.getVideoReceiver().tick();
+
+                StatsReceiver.StatsSnapshot statsSnapshot = statsReceiver.poll();
+                if (statsSnapshot != null) {
+                    controller.currentPoseLabel.setText(statsSnapshot.current_pose());
+                    controller.fpsLabel.setText(String.valueOf((int)statsSnapshot.fps()));
+                    controller.handsNumLabel.setText(String.valueOf(statsSnapshot.hands_num()));
+                }
             }
         };
 
