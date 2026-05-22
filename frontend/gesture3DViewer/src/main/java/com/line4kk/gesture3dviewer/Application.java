@@ -2,6 +2,7 @@ package com.line4kk.gesture3dviewer;
 
 import atlantafx.base.theme.CupertinoLight;
 import com.line4kk.gesture3dviewer.model.AccumulatedData;
+import com.line4kk.gesture3dviewer.model.UserSettingsManager;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
@@ -11,11 +12,15 @@ import javafx.stage.Stage;
 import org.lwjgl.assimp.AIScene;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class Application extends javafx.application.Application {
     private static SceneController controller;
+
     @Override
     public void start(Stage stage) throws IOException {
+        UserSettingsManager.loadOrCreate();
+
         FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("views/main-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1000, 800);
         stage.setTitle("Gesture3D Viewer");
@@ -23,6 +28,19 @@ public class Application extends javafx.application.Application {
         scene.getRoot().requestFocus();
 
         controller = fxmlLoader.getController();
+
+        BackendProcess backendProcess = new BackendProcess();
+
+        stage.setOnCloseRequest(event -> {
+            if (!controller.confirmCloseIfNeeded()) {
+                event.consume();
+            }
+        });
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            backendProcess.stop();
+        }));
+
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.RIGHT) {
                 controller.rotateXYModelBy(0, -15);
@@ -58,18 +76,6 @@ public class Application extends javafx.application.Application {
             if (event.getCode() == KeyCode.BACK_SPACE) {
                 controller.resetView();
             }
-            if (event.getCode() == KeyCode.SPACE) {
-//                AIScene aiScene = AssetLoader.loadAsset("gesture3DViewer/src/main/resources/com/line4kk/gesture3dviewer/models/bugatti.obj");
-//                AIScene aiScene = AssetLoader.loadAsset("gesture3DViewer/src/main/resources/com/line4kk/gesture3dviewer/models/model_1.obj");
-//                AIScene aiScene = AssetLoader.loadAsset("gesture3DViewer/src/main/resources/com/line4kk/gesture3dviewer/models/banjofrog.obj");
-                AIScene aiScene = AssetLoader.loadAsset("gesture3DViewer/src/main/resources/com/line4kk/gesture3dviewer/models/mcqueen/mcqueen.obj");
-                Group modelScene = MeshConverter.convertScene(aiScene);
-                controller.setModelScene(modelScene);
-            }
-            if (event.getCode() == KeyCode.ALT) {
-                controller.removeModel();
-            }
-
         });
 
         scene.setOnScroll(event -> {
@@ -110,7 +116,7 @@ public class Application extends javafx.application.Application {
                     controller.resetView();
                 }
                 if (accumulatedData.isScreenshot()) {
-
+                    controller.captureScreenshot();
                 }
                 controller.getVideoReceiver().tick();
 

@@ -3,14 +3,15 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ColorPicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
-<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.TreeView?>
@@ -63,10 +64,10 @@
           <Menu mnemonicParsing="false" text="Файл">
                <items>
                   <MenuItem mnemonicParsing="false" onAction="#onCreateProjectBtnClicked" text="Создать проект" />
-                  <MenuItem mnemonicParsing="false" text="Открыть проект" />
+                  <MenuItem mnemonicParsing="false" onAction="#onOpenProjectBtnClicked" text="Открыть проект" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="Сохранить" />
-                  <MenuItem mnemonicParsing="false" text="Сохранить как" />
+                  <MenuItem mnemonicParsing="false" onAction="#onSaveProjectBtnClicked" text="Сохранить" />
+                  <MenuItem mnemonicParsing="false" onAction="#onSaveProjectAsBtnClicked" text="Сохранить как" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem fx:id="exitButton" mnemonicParsing="false" onAction="#onExitBtnClicked" text="Закрыть" />
                </items>
@@ -113,63 +114,93 @@
             <content>
               <AnchorPane prefHeight="326.0" prefWidth="161.0">
                      <children>
-                        <VBox prefHeight="322.0" prefWidth="300.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                        <VBox prefHeight="322.0" prefWidth="300.0" spacing="10.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                            <children>
-                              <Label text="Настройки чувствительности:">
+                              <Label text="Пользовательские настройки">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <VBox prefHeight="200.0" prefWidth="100.0">
+                              <HBox alignment="CENTER_LEFT" fillHeight="false">
                                  <children>
-                                    <HBox alignment="CENTER_LEFT" fillHeight="false">
-                                       <children>
-                                          <Label alignment="CENTER" text="Вращение объекта:" />
-                                          <TextField prefHeight="26.0" prefWidth="69.0">
-                                             <HBox.margin>
-                                                <Insets left="10.0" />
-                                             </HBox.margin>
-                                          </TextField>
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets bottom="5.0" />
-                                       </VBox.margin>
-                                    </HBox>
-                                    <Slider />
-                                    <HBox alignment="CENTER_LEFT" fillHeight="false" layoutX="10.0" layoutY="10.0">
-                                       <children>
-                                          <Label text="Перемещение камеры:" />
-                                          <TextField prefHeight="26.0" prefWidth="69.0">
-                                             <HBox.margin>
-                                                <Insets left="10.0" />
-                                             </HBox.margin>
-                                          </TextField>
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets bottom="5.0" top="10.0" />
-                                       </VBox.margin>
-                                    </HBox>
-                                    <Slider />
-                                    <HBox alignment="CENTER_LEFT" fillHeight="false" layoutX="10.0" layoutY="51.0">
-                                       <children>
-                                          <Label text="Масштабирование камеры:" />
-                                          <TextField prefHeight="26.0" prefWidth="69.0">
-                                             <HBox.margin>
-                                                <Insets left="10.0" />
-                                             </HBox.margin>
-                                          </TextField>
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets bottom="5.0" top="10.0" />
-                                       </VBox.margin>
-                                    </HBox>
-                                    <Slider />
+                                    <Label text="Вращение объекта:" />
+                                    <TextField fx:id="rotateSensitivityField" prefHeight="26.0" prefWidth="90.0">
+                                       <HBox.margin>
+                                          <Insets left="10.0" />
+                                       </HBox.margin>
+                                    </TextField>
+                                    <Slider fx:id="rotateSensitivitySlider" blockIncrement="1.0" max="1000.0" min="0.0" prefWidth="120.0">
+                                       <HBox.margin>
+                                          <Insets left="10.0" />
+                                       </HBox.margin>
+                                    </Slider>
                                  </children>
-                                 <VBox.margin>
-                                    <Insets left="5.0" top="5.0" />
-                                 </VBox.margin>
-                              </VBox>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" fillHeight="false">
+                                 <children>
+                                    <Label text="Перемещение камеры:" />
+                                    <TextField fx:id="cameraPanSensitivityField" prefHeight="26.0" prefWidth="90.0">
+                                       <HBox.margin>
+                                          <Insets left="10.0" />
+                                       </HBox.margin>
+                                    </TextField>
+                                    <Slider fx:id="cameraPanSensitivitySlider" blockIncrement="1.0" max="2000.0" min="0.0" prefWidth="120.0">
+                                       <HBox.margin>
+                                          <Insets left="10.0" />
+                                       </HBox.margin>
+                                    </Slider>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" fillHeight="false">
+                                 <children>
+                                    <Label text="Масштаб камеры:" />
+                                    <TextField fx:id="cameraScaleSensitivityField" prefHeight="26.0" prefWidth="90.0">
+                                       <HBox.margin>
+                                          <Insets left="10.0" />
+                                       </HBox.margin>
+                                    </TextField>
+                                    <Slider fx:id="cameraScaleSensitivitySlider" blockIncrement="1.0" max="2000.0" min="0.0" prefWidth="120.0">
+                                       <HBox.margin>
+                                          <Insets left="10.0" />
+                                       </HBox.margin>
+                                    </Slider>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" fillHeight="false">
+                                 <children>
+                                    <Label text="Сила освещения:" />
+                                    <TextField fx:id="lightingRangeCoefficientField" prefHeight="26.0" prefWidth="90.0">
+                                       <HBox.margin>
+                                          <Insets left="10.0" />
+                                       </HBox.margin>
+                                    </TextField>
+                                    <Slider fx:id="lightingRangeCoefficientSlider" blockIncrement="0.1" max="20.0" min="0.0" prefWidth="120.0">
+                                       <HBox.margin>
+                                          <Insets left="10.0" />
+                                       </HBox.margin>
+                                    </Slider>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" fillHeight="false">
+                                 <children>
+                                    <Label text="Цвет фона:" />
+                                    <ColorPicker fx:id="backgroundColorPicker">
+                                       <HBox.margin>
+                                          <Insets left="10.0" />
+                                       </HBox.margin>
+                                    </ColorPicker>
+                                 </children>
+                              </HBox>
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <Button fx:id="saveUserSettingsButton" mnemonicParsing="false" onAction="#onSaveUserSettingsBtnClicked" text="Сохранить настройки" />
+                                    <Button fx:id="resetUserSettingsButton" mnemonicParsing="false" onAction="#onResetUserSettingsBtnClicked" text="Сбросить по умолчанию" />
+                                 </children>
+                              </HBox>
                            </children>
+                           <VBox.margin>
+                              <Insets left="5.0" top="5.0" />
+                           </VBox.margin>
                         </VBox>
                      </children>
                   </AnchorPane>

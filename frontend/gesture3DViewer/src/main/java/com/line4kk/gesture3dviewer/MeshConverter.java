@@ -9,11 +9,13 @@ import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
 import javafx.scene.shape.TriangleMesh;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.IntBuffer;
 
 public class MeshConverter {
     
-    private static Group convertMesh(AIMesh aiMesh, PointerBuffer materials) {
+    private static Group convertMesh(AIMesh aiMesh, PointerBuffer materials, Path modelDirectory) {
         Group outMesh = new Group();
 
         int vertexCount = aiMesh.mNumVertices();
@@ -111,7 +113,7 @@ public class MeshConverter {
             meshView.setCullFace(CullFace.NONE);
 
             AIMaterial aiMaterial = AIMaterial.create(materials.get(aiMesh.mMaterialIndex()));
-            PhongMaterial phongMaterial = convertMaterial(aiMaterial);
+            PhongMaterial phongMaterial = convertMaterial(aiMaterial, modelDirectory);
             meshView.setMaterial(phongMaterial);
 
             outMesh.getChildren().add(meshView);
@@ -129,7 +131,7 @@ public class MeshConverter {
         return outMesh;
     }
 
-    private static PhongMaterial convertMaterial(AIMaterial aiMaterial) {
+    private static PhongMaterial convertMaterial(AIMaterial aiMaterial, Path modelDirectory) {
 
         PhongMaterial material = new PhongMaterial();
 
@@ -173,9 +175,11 @@ public class MeshConverter {
             String texPath = path.dataString();
             if (!texPath.isBlank()) {
                 try {
-                    java.io.File file = new java.io.File("gesture3DViewer/src/main/resources/com/line4kk/gesture3dviewer/models/mcqueen/" + texPath);
-                    Image img = new Image(file.toURI().toString());
-                    material.setDiffuseMap(img);
+                    Path texturePath = resolveTexturePath(modelDirectory, texPath);
+                    if (texturePath != null) {
+                        Image img = new Image(texturePath.toUri().toString());
+                        material.setDiffuseMap(img);
+                    }
 
                 } catch (Exception ignored) {}
             }
@@ -258,10 +262,11 @@ public class MeshConverter {
 
             if (!texPath.isBlank()) {
                 try {
-                    java.io.File file = new java.io.File("gesture3DViewer/src/main/resources/com/line4kk/gesture3dviewer/models/mcqueen/" + texPath);
-                    Image img = new Image(file.toURI().toString());
-
-                    material.setBumpMap(img);
+                    Path texturePath = resolveTexturePath(modelDirectory, texPath);
+                    if (texturePath != null) {
+                        Image img = new Image(texturePath.toUri().toString());
+                        material.setBumpMap(img);
+                    }
 
                 } catch (Exception ignored) {}
             }
@@ -287,6 +292,10 @@ public class MeshConverter {
     }
 
     public static Group convertScene(AIScene scene) {
+        return convertScene(scene, null);
+    }
+
+    public static Group convertScene(AIScene scene, Path sourcePath) {
         // Получить группу всей сцены модели
 
         Group modelScene = new Group();
@@ -295,12 +304,34 @@ public class MeshConverter {
             return modelScene;
         }
 
+        Path modelDirectory = sourcePath == null ? null : sourcePath.toAbsolutePath().getParent();
+
         for (int i = 0; i < scene.mNumMeshes(); i++) {
             AIMesh aiMesh = AIMesh.create(scene.mMeshes().get(i));
-            Group mesh = convertMesh(aiMesh, scene.mMaterials());
+            Group mesh = convertMesh(aiMesh, scene.mMaterials(), modelDirectory);
             modelScene.getChildren().add(mesh);
         }
 
         return modelScene;
+    }
+
+    private static Path resolveTexturePath(Path modelDirectory, String textureReference) {
+        if (textureReference == null || textureReference.isBlank()) {
+            return null;
+        }
+
+        Path directPath = Path.of(textureReference);
+        if (Files.isRegularFile(directPath)) {
+            return directPath;
+        }
+
+        if (modelDirectory != null) {
+            Path relativeToModel = modelDirectory.resolve(textureReference).normalize();
+            if (Files.isRegularFile(relativeToModel)) {
+                return relativeToModel;
+            }
+        }
+
+        return null;
     }
 }

@@ -31,9 +31,10 @@ public class CreateProjectController {
         if (!UIChecks.isValidPath(pathField.getText())) return;
 
         ViewerProject project = new ViewerProject(pathField.getText(), nameField.getText());
-        project.createDirectory();
-        Application.getController().setProject(project);
-        closeWindow();
+        if (project.createDirectory()) {
+            Application.getController().setProject(project);
+            closeWindow();
+        }
     }
 
     @FXML
