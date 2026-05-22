@@ -1,11 +1,14 @@
+import logging
+import time
 from pathlib import Path
 
 import cv2
 import mediapipe as mp
+import zmq
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.vision import GestureRecognizerOptions
 
-from .datasender import DataSender
+from .senders import DataSender, CommandReceiver, UserVideoSender
 from .gesture_detectors.camera_pan_detector import CameraPanDetector
 from .gesture_detectors.reset_view_detector import ResetViewDetector
 from .gesture_detectors.rotate_detector import RotateDetector
@@ -15,6 +18,12 @@ from .gesture_detectors.screenshot_gesture_detector import ScreenshotDetector
 from .gesture_handler import GestureHandler
 
 if __name__ == "__main__":
+    logger = logging.getLogger("main")
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(name)s | %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
 
     VisionRunningMode = mp.tasks.vision.RunningMode
     BaseOptions = mp.tasks.BaseOptions
@@ -32,18 +41,30 @@ if __name__ == "__main__":
         min_hand_presence_confidence=0.5,
         min_tracking_confidence=0.5,
     )
-
     # Создаём распознаватель
     recognizer = vision.GestureRecognizer.create_from_options(options)
+    logger.info("Gesture recognizer has been started")
 
     cap = cv2.VideoCapture(1)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
-    sender = DataSender()
+    context = zmq.Context()
+    recognize_data_sender = DataSender(context)
+    stats_sender = DataSender(context, "tcp://*:5558")
+    video_sender = UserVideoSender(context)
+    command_receiver = CommandReceiver(context)
 
     gesture_handler = GestureHandler([ScaleDetector(), CameraPanDetector(),  ScreenshotDetector(), RotateDetector(), RotateZDetector(), ResetViewDetector()])
 
+    fps_counter = 0
+    fps_display = 0
+
+    start_time = time.perf_counter()
 
     while cap.isOpened():
+        fps_counter += 1
         ret, frame = cap.read()
 
         if not ret:
@@ -55,7 +76,7 @@ if __name__ == "__main__":
         # Запускаем распознавание
         results = recognizer.recognize_for_video(
             mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame),
-            int(cap.get(cv2.CAP_PROP_POS_MSEC))  # timestamp в мс
+            int(time.perf_counter() * 1000)  # timestamp в мс
         )
         for hand_landmarks in results.hand_landmarks:
             for idx, landmark in enumerate(hand_landmarks):
@@ -63,23 +84,32 @@ if __name__ == "__main__":
                 y = int(landmark.y * frame.shape[0])
                 cv2.circle(frame, (x, y), 4, (255, 0, 0), -1)
 
+        if command_receiver.is_video_streaming():
+            _, buf = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 70])
+            video_sender.send_frame(buf.tobytes())
+
         result_data = gesture_handler.handle(results)
         if result_data:
-            sender.send(result_data.get_packet())
+            recognize_data_sender.send(result_data.get_packet())
 
-        cv2.putText(
-            frame,
-            f"{gesture_handler.get_last_pose().pose_label if gesture_handler.get_last_pose() else None}",
-            (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2
-        )
-        cv2.imshow("Gesture Recognition", frame)
+        current_time = time.perf_counter()
+        elapsed = current_time - start_time
+        if elapsed >= 1.0:
+            fps_display = fps_counter / elapsed
+            fps_counter = 0
+            start_time = current_time
 
+        stats = {"fps": fps_display, "hands_num": len(results.hand_landmarks), "current_pose": gesture_handler.get_last_pose().pose_label if gesture_handler.get_last_pose() else None}
+        stats_sender.send(stats)
         if cv2.waitKey(1) & 0xFF == 27:
             break
 
     cap.release()
     cv2.destroyAllWindows()
-    sender.close()
 
+    recognize_data_sender.close()
+    video_sender.close()
+    command_receiver.close()
+    context.term()
 
 

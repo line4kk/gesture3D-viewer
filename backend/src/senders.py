@@ -22,7 +22,7 @@ class DataSender:
         formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(name)s | %(message)s")
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
-        self.logger.setLevel(logging.DEBUG)
+        self.logger.setLevel(logging.INFO)
 
         time.sleep(1)
 
