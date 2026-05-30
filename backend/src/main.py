@@ -17,6 +17,13 @@ from .gesture_detectors.scale_gesture_detector import ScaleDetector
 from .gesture_detectors.screenshot_gesture_detector import ScreenshotDetector
 from .gesture_handler import GestureHandler
 
+def set_cap(index):
+    c = cv2.VideoCapture(index)
+    c.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    c.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    c.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+    return c
+
 if __name__ == "__main__":
     logger = logging.getLogger("main")
     handler = logging.StreamHandler()
@@ -45,11 +52,6 @@ if __name__ == "__main__":
     recognizer = vision.GestureRecognizer.create_from_options(options)
     logger.info("Gesture recognizer has been started")
 
-    cap = cv2.VideoCapture(1)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
-
     context = zmq.Context()
     recognize_data_sender = DataSender(context)
     stats_sender = DataSender(context, "tcp://*:5558")
@@ -62,6 +64,16 @@ if __name__ == "__main__":
     fps_display = 0
 
     start_time = time.perf_counter()
+
+    while not command_receiver.is_need_to_change_camera():
+        if (time.perf_counter() - start_time) > 5:
+            logger.error("Camera data not received. Setting to default value")
+            cap = set_cap(0)
+            break
+    else:
+        logger.info("Setting camera to " + str(command_receiver.get_new_camera_index()))
+        cap = set_cap(command_receiver.get_new_camera_index())
+
 
     while cap.isOpened():
         fps_counter += 1
@@ -101,6 +113,11 @@ if __name__ == "__main__":
 
         stats = {"fps": fps_display, "hands_num": len(results.hand_landmarks), "current_pose": gesture_handler.get_last_pose().pose_label if gesture_handler.get_last_pose() else None}
         stats_sender.send(stats)
+
+        if command_receiver.is_need_to_change_camera():
+            logger.info("Changing camera to " + str(command_receiver.get_new_camera_index()))
+            cap = set_cap(command_receiver.get_new_camera_index())
+
         if cv2.waitKey(1) & 0xFF == 27:
             break
 

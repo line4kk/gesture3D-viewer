@@ -89,8 +89,6 @@ public class SceneController {
     @FXML
     private ColorPicker backgroundColorPicker;
     @FXML
-    private Button reloadRecognizerButton;
-    @FXML
     private ChoiceBox<String> choiceCamera;
 
     @FXML
@@ -150,8 +148,8 @@ public class SceneController {
 
         videoReceiver = new UserVideoReceiver(webcamView);
         currentUserSettings = UserSettingsManager.getCurrentSettings();
-        initializeSettingsPane();
         initializeCameraList();
+        initializeSettingsPane();
     }
 
     private void updateProjectActionButtons(TreeItem<File> selectedItem) {
@@ -181,7 +179,15 @@ public class SceneController {
         for (Webcam webcam : webcams) {
             choiceCamera.getItems().add(webcam.getName().replaceAll("\\s+\\d+$", ""));
         }
-        choiceCamera.setValue(choiceCamera.getItems().getFirst());
+        choiceCamera.setValue(choiceCamera.getItems().get(currentUserSettings.chosenCameraInd));
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(2000);
+            } catch (Exception ignored) {}
+
+            BackendRequester.send("SET_CAMERA " + choiceCamera.getValue());
+        }).start();
     }
 
     private void installNumericFilters() {
@@ -215,6 +221,8 @@ public class SceneController {
             lightingRangeCoefficientSlider.setValue(settings.lightingRangeCoefficient);
 
             backgroundColorPicker.setValue(Color.web(settings.backgroundColor));
+
+            choiceCamera.setValue(choiceCamera.getItems().get(settings.chosenCameraInd));
             applyRuntimeSettings(settings);
         }
         finally {
@@ -237,6 +245,19 @@ public class SceneController {
             applyRuntimeSettings(currentUserSettings);
             markSettingsDirty();
         });
+
+        choiceCamera.getSelectionModel().selectedIndexProperty().addListener(
+                (_, _, newIndex) -> {
+                    int selectedIndex = newIndex.intValue();
+                    if (selectedIndex >= 0) {
+                        System.out.println("Выбран элемент: " + selectedIndex);
+                        currentUserSettings.chosenCameraInd = selectedIndex;
+                        markSettingsDirty();
+                        new Thread(() -> BackendRequester.send("SET_CAMERA " + choiceCamera.getValue())).start();
+
+                    }
+                }
+        );
     }
 
     private void installNumericFilter(TextField field) {
@@ -318,6 +339,7 @@ public class SceneController {
         ViewerSettings.cameraScaleSensitivity = settings.cameraScaleSensitivity;
         ViewerSettings.lightingRangeCoefficient = settings.lightingRangeCoefficient;
         ViewerSettings.backgroundColor = settings.backgroundColor;
+        ViewerSettings.chosenCameraInd = settings.chosenCameraInd;
 
         if (pointLight != null) {
             pointLight.setTranslateZ(-ViewerSettings.lightingRangeCoefficient * ViewerSettings.initBoundingBox);

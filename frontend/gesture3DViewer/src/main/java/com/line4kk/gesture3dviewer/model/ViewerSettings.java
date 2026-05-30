@@ -10,6 +10,7 @@ public class ViewerSettings {
     public static double initCameraZ = -450;
     public static double lightingRangeCoefficient = 8;  // 2-10
     public static String backgroundColor = "#78BFDE";
+    public static int chosenCameraInd = 0;
 
     public static Color getBackgroundColor() {
         return Color.web(backgroundColor);

@@ -56,12 +56,6 @@
                </padding>
             </Label>
             <Label fx:id="objectFileLabel" layoutX="224.0" layoutY="11.0" text="не задан" />
-            <Label text="Распознавание жестов:">
-               <padding>
-                  <Insets left="10.0" />
-               </padding>
-            </Label>
-            <Label text="включение..." textFill="#ff8900" />
          </children>
       </HBox>
    </bottom>
@@ -129,7 +123,7 @@
                                     </Label>
                                     <HBox alignment="CENTER_LEFT" fillHeight="false">
                                        <children>
-                                          <Label text="Вращение объекта:" />
+                                          <Label text="Вращение объекта:" HBox.hgrow="ALWAYS" />
                                           <TextField fx:id="rotateSensitivityField" prefHeight="26.0" prefWidth="90.0">
                                              <HBox.margin>
                                                 <Insets left="10.0" />
@@ -144,7 +138,7 @@
                                     </HBox>
                                     <HBox alignment="CENTER_LEFT" fillHeight="false">
                                        <children>
-                                          <Label text="Перемещение камеры:" />
+                                          <Label text="Перемещение камеры:" HBox.hgrow="ALWAYS" />
                                           <TextField fx:id="cameraPanSensitivityField" prefHeight="26.0" prefWidth="90.0">
                                              <HBox.margin>
                                                 <Insets left="10.0" />
@@ -159,7 +153,7 @@
                                     </HBox>
                                     <HBox alignment="CENTER_LEFT" fillHeight="false">
                                        <children>
-                                          <Label text="Масштаб камеры:" />
+                                          <Label text="Масштаб камеры:" HBox.hgrow="ALWAYS" />
                                           <TextField fx:id="cameraScaleSensitivityField" prefHeight="26.0" prefWidth="90.0">
                                              <HBox.margin>
                                                 <Insets left="10.0" />
@@ -174,7 +168,7 @@
                                     </HBox>
                                     <HBox alignment="CENTER_LEFT" fillHeight="false">
                                        <children>
-                                          <Label text="Сила освещения:" />
+                                          <Label text="Сила освещения:" HBox.hgrow="ALWAYS" />
                                           <TextField fx:id="lightingRangeCoefficientField" prefHeight="26.0" prefWidth="90.0">
                                              <HBox.margin>
                                                 <Insets left="10.0" />
@@ -189,7 +183,7 @@
                                     </HBox>
                                     <HBox alignment="CENTER_LEFT" fillHeight="false" prefHeight="34.0" prefWidth="290.0">
                                        <children>
-                                          <Label text="Цвет фона:" />
+                                          <Label text="Цвет фона:" HBox.hgrow="ALWAYS" />
                                           <ColorPicker fx:id="backgroundColorPicker" prefHeight="33.0" prefWidth="126.0">
                                              <HBox.margin>
                                                 <Insets left="10.0" />
@@ -197,21 +191,19 @@
                                           </ColorPicker>
                                        </children>
                                     </HBox>
+                                    <HBox alignment="CENTER_LEFT" fillHeight="false" prefHeight="27.0" prefWidth="290.0">
+                                       <children>
+                                          <Label text="Камера:" HBox.hgrow="ALWAYS" />
+                                          <ChoiceBox fx:id="choiceCamera" prefHeight="26.0" prefWidth="218.0" HBox.hgrow="ALWAYS">
+                                             <HBox.margin>
+                                                <Insets left="10.0" />
+                                             </HBox.margin></ChoiceBox>
+                                       </children>
+                                    </HBox>
                                     <HBox prefHeight="23.0" prefWidth="290.0" spacing="10.0">
                                        <children>
                                           <Button fx:id="saveUserSettingsButton" mnemonicParsing="false" onAction="#onSaveUserSettingsBtnClicked" prefHeight="26.0" prefWidth="141.0" text="Сохранить" />
                                           <Button fx:id="resetUserSettingsButton" mnemonicParsing="false" onAction="#onResetUserSettingsBtnClicked" prefHeight="26.0" prefWidth="141.0" text="Сбросить" />
-                                       </children>
-                                    </HBox>
-                                    <Label layoutX="10.0" layoutY="10.0" text="Распознаватель жестов">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </Label>
-                                    <HBox prefHeight="27.0" prefWidth="290.0" spacing="5.0">
-                                       <children>
-                                          <Button fx:id="reloadRecognizerButton" mnemonicParsing="false" text="Перезагрузить" />
-                                          <ChoiceBox fx:id="choiceCamera" prefHeight="26.0" prefWidth="186.0" />
                                        </children>
                                     </HBox>
                                  </children>

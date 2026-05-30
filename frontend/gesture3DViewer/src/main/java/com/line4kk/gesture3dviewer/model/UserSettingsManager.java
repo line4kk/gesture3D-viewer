@@ -102,5 +102,6 @@ public final class UserSettingsManager {
         ViewerSettings.initCameraZ = settings.initCameraZ;
         ViewerSettings.lightingRangeCoefficient = settings.lightingRangeCoefficient;
         ViewerSettings.backgroundColor = settings.backgroundColor;
+        ViewerSettings.chosenCameraInd = settings.chosenCameraInd;
     }
 }

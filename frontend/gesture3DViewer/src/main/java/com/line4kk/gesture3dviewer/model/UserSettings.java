@@ -11,6 +11,7 @@ public class UserSettings {
     public static final double DEFAULT_INIT_CAMERA_Z = -450;
     public static final double DEFAULT_LIGHTING_RANGE_COEFFICIENT = 8;
     public static final String DEFAULT_BACKGROUND_COLOR = "#78BFDE";
+    public static final int DEFAULT_CHOSEN_CAMERA_IND = 0;
 
     public double rotateSensitivity = ViewerSettings.rotateSensitivity;
     public double cameraPanSensitivity = ViewerSettings.cameraPanSensitivity;
@@ -19,6 +20,7 @@ public class UserSettings {
     public double initCameraZ = ViewerSettings.initCameraZ;
     public double lightingRangeCoefficient = ViewerSettings.lightingRangeCoefficient;
     public String backgroundColor = ViewerSettings.backgroundColor;
+    public int chosenCameraInd = ViewerSettings.chosenCameraInd;
 
     public static UserSettings defaults() {
         UserSettings settings = new UserSettings();
@@ -29,6 +31,7 @@ public class UserSettings {
         settings.initCameraZ = DEFAULT_INIT_CAMERA_Z;
         settings.lightingRangeCoefficient = DEFAULT_LIGHTING_RANGE_COEFFICIENT;
         settings.backgroundColor = DEFAULT_BACKGROUND_COLOR;
+        settings.chosenCameraInd = DEFAULT_CHOSEN_CAMERA_IND;
         return settings;
     }
 }
