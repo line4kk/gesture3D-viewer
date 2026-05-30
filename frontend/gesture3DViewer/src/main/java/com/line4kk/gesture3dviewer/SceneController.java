@@ -477,7 +477,7 @@ public class SceneController {
 
         Alert alert = new Alert(
                 Alert.AlertType.CONFIRMATION,
-                "Есть несохраненные изменения. Сохранить проект?",
+                "Есть несохраненные изменения в настройках. Сохранить их?",
                 saveButton,
                 discardButton,
                 cancelButton
