@@ -1,5 +1,6 @@
 package com.line4kk.gesture3dviewer;
 
+import com.github.sarxos.webcam.Webcam;
 import com.line4kk.gesture3dviewer.model.ViewerSettings;
 import com.line4kk.gesture3dviewer.model.UserSettings;
 import com.line4kk.gesture3dviewer.model.UserSettingsManager;
@@ -88,7 +89,9 @@ public class SceneController {
     @FXML
     private ColorPicker backgroundColorPicker;
     @FXML
-    private Button resetUserSettingsButton;
+    private Button reloadRecognizerButton;
+    @FXML
+    private ChoiceBox<String> choiceCamera;
 
     @FXML
     public Label objectFileLabel;
@@ -148,6 +151,7 @@ public class SceneController {
         videoReceiver = new UserVideoReceiver(webcamView);
         currentUserSettings = UserSettingsManager.getCurrentSettings();
         initializeSettingsPane();
+        initializeCameraList();
     }
 
     private void updateProjectActionButtons(TreeItem<File> selectedItem) {
@@ -169,6 +173,15 @@ public class SceneController {
         installNumericFilters();
         bindSettingsControls();
         saveUserSettingsButton.setDisable(true);
+    }
+
+    private void initializeCameraList() {
+        List<Webcam> webcams = Webcam.getWebcams();
+
+        for (Webcam webcam : webcams) {
+            choiceCamera.getItems().add(webcam.getName().replaceAll("\\s+\\d+$", ""));
+        }
+        choiceCamera.setValue(choiceCamera.getItems().getFirst());
     }
 
     private void installNumericFilters() {

@@ -8,6 +8,7 @@ module com.line4kk.gesture3dviewer {
     requires javafx.graphics;
     requires atlantafx.base;
     requires java.desktop;
+    requires webcam.capture;
 
 
     exports com.line4kk.gesture3dviewer;
