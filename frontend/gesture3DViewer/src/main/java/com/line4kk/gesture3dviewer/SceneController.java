@@ -263,7 +263,7 @@ public class SceneController {
     private void installNumericFilter(TextField field) {
         field.setTextFormatter(new TextFormatter<>(change -> {
             String newText = change.getControlNewText();
-            if (newText.isEmpty() || newText.matches("-?\\d*(\\.\\d*)?")) {
+            if (newText.isEmpty() || newText.matches("\\d*(\\.\\d*)?")) {
                 return change;
             }
 
