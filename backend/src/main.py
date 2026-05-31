@@ -1,4 +1,7 @@
 import logging
+import sys
+import shutil
+import tempfile
 import time
 from pathlib import Path
 
@@ -8,14 +11,14 @@ import zmq
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.vision import GestureRecognizerOptions
 
-from .senders import DataSender, CommandReceiver, UserVideoSender
-from .gesture_detectors.camera_pan_detector import CameraPanDetector
-from .gesture_detectors.reset_view_detector import ResetViewDetector
-from .gesture_detectors.rotate_detector import RotateDetector
-from .gesture_detectors.rotate_z_detector import RotateZDetector
-from .gesture_detectors.scale_gesture_detector import ScaleDetector
-from .gesture_detectors.screenshot_gesture_detector import ScreenshotDetector
-from .gesture_handler import GestureHandler
+from src.senders import DataSender, CommandReceiver, UserVideoSender
+from src.gesture_detectors.camera_pan_detector import CameraPanDetector
+from src.gesture_detectors.reset_view_detector import ResetViewDetector
+from src.gesture_detectors.rotate_detector import RotateDetector
+from src.gesture_detectors.rotate_z_detector import RotateZDetector
+from src.gesture_detectors.scale_gesture_detector import ScaleDetector
+from src.gesture_detectors.screenshot_gesture_detector import ScreenshotDetector
+from src.gesture_handler import GestureHandler
 
 def set_cap(index):
     c = cv2.VideoCapture(index)
@@ -24,7 +27,22 @@ def set_cap(index):
     c.set(cv2.CAP_PROP_BUFFERSIZE, 1)
     return c
 
-if __name__ == "__main__":
+
+def resolve_model_path() -> Path:
+    if getattr(sys, "frozen", False):
+        bundled_model = Path(getattr(sys, "_MEIPASS")) / "resources" / "models" / "gesture_recognizer.task"
+        temp_model_dir = Path(tempfile.gettempdir()) / "gesture3d-viewer"
+        temp_model_dir.mkdir(parents=True, exist_ok=True)
+        temp_model = temp_model_dir / "gesture_recognizer.task"
+
+        if not temp_model.is_file() or temp_model.stat().st_size != bundled_model.stat().st_size:
+            shutil.copy2(bundled_model, temp_model)
+
+        return temp_model
+
+    return Path(__file__).resolve().parents[1] / "resources" / "models" / "gesture_recognizer.task"
+
+def main():
     logger = logging.getLogger("main")
     handler = logging.StreamHandler()
     formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(name)s | %(message)s")
@@ -36,7 +54,7 @@ if __name__ == "__main__":
     BaseOptions = mp.tasks.BaseOptions
 
     # Путь к модели относительно директории backend.
-    MODEL_PATH = Path(__file__).resolve().parents[1] / "resources" / "models" / "gesture_recognizer.task"
+    MODEL_PATH = resolve_model_path()
 
     # Настройки
     base_options = BaseOptions(model_asset_path=str(MODEL_PATH))
@@ -129,4 +147,5 @@ if __name__ == "__main__":
     command_receiver.close()
     context.term()
 
-
+if __name__ == "__main__":
+    main()
