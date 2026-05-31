@@ -107,7 +107,7 @@ public class AssetLoader {
                     .filter(path -> path.getFileName().toString().toLowerCase().endsWith(".mtl"))
                     .toList();
             if (mtls.size() == 1) {
-                return mtls.get(0);
+                return mtls.getFirst();
             }
         }
 

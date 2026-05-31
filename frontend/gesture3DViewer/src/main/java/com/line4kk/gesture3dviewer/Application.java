@@ -5,14 +5,12 @@ import com.line4kk.gesture3dviewer.model.AccumulatedData;
 import com.line4kk.gesture3dviewer.model.UserSettingsManager;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
-import org.lwjgl.assimp.AIScene;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 public class Application extends javafx.application.Application {
     private static SceneController controller;
@@ -24,6 +22,7 @@ public class Application extends javafx.application.Application {
         FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("views/main-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1000, 800);
         stage.setTitle("Gesture3D Viewer");
+        stage.getIcons().add(new Image(Application.class.getResourceAsStream("icons/icon.png")));
         stage.setScene(scene);
         scene.getRoot().requestFocus();
 
@@ -42,22 +41,22 @@ public class Application extends javafx.application.Application {
         }));
 
         scene.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.RIGHT) {
+            if (event.getCode() == KeyCode.D) {
                 controller.rotateXYModelBy(0, -15);
             }
-            if (event.getCode() == KeyCode.LEFT) {
+            if (event.getCode() == KeyCode.A) {
                 controller.rotateXYModelBy(0, 15);
             }
-            if (event.getCode() == KeyCode.UP) {
+            if (event.getCode() == KeyCode.W) {
                 controller.rotateXYModelBy(-15, 0);
             }
-            if (event.getCode() == KeyCode.DOWN) {
+            if (event.getCode() == KeyCode.S) {
                 controller.rotateXYModelBy(15, 0);
             }
-            if (event.getCode() == KeyCode.D) {
+            if (event.getCode() == KeyCode.E) {
                 controller.rotateZModelBy(15);
             }
-            if (event.getCode() == KeyCode.A) {
+            if (event.getCode() == KeyCode.Q) {
                 controller.rotateZModelBy(-15);
             }
             if (event.getCode() == KeyCode.Y) {
