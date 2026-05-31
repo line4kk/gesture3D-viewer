@@ -4,11 +4,12 @@ from mediapipe.tasks.python.vision.gesture_recognizer_result import GestureRecog
 
 from .base_gesture_detector import GestureDetector
 from ..gesture_recognizing.gesture_recognizers import is_photo_gesture
-
+from .gesture_detector_result import GestureDetectorResult
 
 class ScreenshotDetector(GestureDetector):
     def __init__(self, error=0.05, latency=1):
         self.__type = "screenshot"
+        self.__pose_label = "\"Camera\" gesture"
         self.__latency = latency
         self.__error = error
 
@@ -32,16 +33,15 @@ class ScreenshotDetector(GestureDetector):
         self.__is_detected = False
 
     def detect(self, rcg_results: GestureRecognizerResult, hand_idx=0):
-        detected = {}
         if self.__is_detected:
             self.reset_state()
-            return {}
+            return None
         if len(rcg_results.gestures) != 2:
             self.reset_state()
-            return {}
+            return None
         if not is_photo_gesture(rcg_results):
             self.reset_state()
-            return {}
+            return None
 
         first_hand_wrist =  rcg_results.hand_landmarks[0][0]
         second_hand_wrist = rcg_results.hand_landmarks[1][0]
@@ -65,7 +65,6 @@ class ScreenshotDetector(GestureDetector):
         else:
             current_time = time.monotonic()
             if current_time - self.__start_time >= self.__latency:
-                detected["type"] = self.__type
                 self.__is_detected = True
 
-        return detected
+        return GestureDetectorResult(self.__type, {}, self.__pose_label)

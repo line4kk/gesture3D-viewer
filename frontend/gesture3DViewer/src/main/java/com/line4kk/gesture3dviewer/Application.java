@@ -1,24 +1,46 @@
 package com.line4kk.gesture3dviewer;
 
+import atlantafx.base.theme.CupertinoLight;
 import com.line4kk.gesture3dviewer.model.AccumulatedData;
+import com.line4kk.gesture3dviewer.model.UserSettingsManager;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
+import org.lwjgl.assimp.AIScene;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class Application extends javafx.application.Application {
     private static SceneController controller;
+
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("main-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 700, 400);
+        UserSettingsManager.loadOrCreate();
+
+        FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("views/main-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 1000, 800);
         stage.setTitle("Gesture3D Viewer");
         stage.setScene(scene);
+        scene.getRoot().requestFocus();
 
         controller = fxmlLoader.getController();
+
+        BackendProcess backendProcess = new BackendProcess();
+
+        stage.setOnCloseRequest(event -> {
+            if (!controller.confirmCloseIfNeeded()) {
+                event.consume();
+            }
+        });
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            backendProcess.stop();
+        }));
+
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.RIGHT) {
                 controller.rotateXYModelBy(0, -15);
@@ -64,15 +86,20 @@ public class Application extends javafx.application.Application {
             }
         });
 
-        DataReceiver receiver = new DataReceiver();
-        Thread thread = new Thread(receiver);
-        thread.setDaemon(true);
-        thread.start();
+        RecognizeDataReceiver recognizeDataReceiver = new RecognizeDataReceiver();
+        Thread threadRcnz = new Thread(recognizeDataReceiver);
+        threadRcnz.setDaemon(true);
+        threadRcnz.start();
+
+        StatsReceiver statsReceiver = new StatsReceiver();
+        Thread threadStats = new Thread(statsReceiver);
+        threadStats.setDaemon(true);
+        threadStats.start();
 
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long l) {
-                AccumulatedData accumulatedData = receiver.getAccumulator().consume();
+                AccumulatedData accumulatedData = recognizeDataReceiver.getAccumulator().consume();
                 if (accumulatedData.getDegreesX() != 0 || accumulatedData.getDegreesY() != 0) {
                     controller.rotateXYModelBy(accumulatedData.getDegreesX(), accumulatedData.getDegreesY());
                 }
@@ -89,14 +116,25 @@ public class Application extends javafx.application.Application {
                     controller.resetView();
                 }
                 if (accumulatedData.isScreenshot()) {
-                    controller.changeCubeColorToRed();
+                    controller.captureScreenshot();
+                }
+                controller.getVideoReceiver().tick();
+
+                StatsReceiver.StatsSnapshot statsSnapshot = statsReceiver.poll();
+                if (statsSnapshot != null) {
+                    controller.currentPoseLabel.setText(statsSnapshot.current_pose());
+                    controller.fpsLabel.setText(String.valueOf((int)statsSnapshot.fps()));
+                    controller.handsNumLabel.setText(String.valueOf(statsSnapshot.hands_num()));
                 }
             }
         };
 
         timer.start();
 
+        Application.setUserAgentStylesheet(new CupertinoLight().getUserAgentStylesheet());
+
         stage.show();
+        stage.setMaximized(true);
     }
 
     public static SceneController getController() {

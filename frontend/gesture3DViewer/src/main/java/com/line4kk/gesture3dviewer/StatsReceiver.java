@@ -1,24 +1,29 @@
 package com.line4kk.gesture3dviewer;
-import com.fasterxml.jackson.core.JsonProcessingException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.line4kk.gesture3dviewer.model.GestureMessage;
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
-public class DataReceiver implements Runnable {
+import java.util.concurrent.atomic.AtomicReference;
+
+public class StatsReceiver implements Runnable {
+
+    public record StatsSnapshot(double fps, int hands_num, String current_pose) {}
+
     private final String address;
     private volatile boolean running = true;
-    private final Accumulator accumulator = new Accumulator();
+    private final AtomicReference<StatsSnapshot> latest = new AtomicReference<>();
 
-    public DataReceiver() {
-        address = "tcp://localhost:5555";
+    public StatsReceiver() {
+        this.address = "tcp://localhost:5558";
     }
 
     @Override
     public void run() {
         try (ZContext context = new ZContext()) {
             ZMQ.Socket socket = context.createSocket(SocketType.SUB);
+            socket.setRcvHWM(1);
             socket.connect(address);
             socket.subscribe("".getBytes(ZMQ.CHARSET));
 
@@ -26,23 +31,19 @@ public class DataReceiver implements Runnable {
 
             while (running && !Thread.currentThread().isInterrupted()) {
                 String message = socket.recvStr();
+                if (message == null) continue;
                 try {
-                    GestureMessage gestureMessage = mapper.readValue(message, GestureMessage.class);
-                    System.out.println(gestureMessage);
-                    accumulator.accumulate(gestureMessage);
-                } catch (JsonProcessingException e) {
-                    // Error logg
-                }
-
+                    latest.set(mapper.readValue(message, StatsSnapshot.class));
+                } catch (Exception ignored) {}
             }
         }
     }
 
-    public void stop() {
-        running = false;
+    public StatsSnapshot poll() {
+        return latest.get();
     }
 
-    public Accumulator getAccumulator() {
-        return accumulator;
+    public void stop() {
+        running = false;
     }
 }

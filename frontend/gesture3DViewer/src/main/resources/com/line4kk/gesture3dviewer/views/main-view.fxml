@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.line4kk.gesture3dviewer.SceneController">
+    <bottom>
+        <HBox alignment="CENTER_LEFT" maxHeight="20.0" minHeight="20.0" prefHeight="20.0" spacing="5.0" BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets />
+            </BorderPane.margin>
+            <children>
+                <Label text="Обнаружено рук:">
+                    <padding>
+                        <Insets left="10.0" />
+                    </padding>
+                </Label>
+                <Label fx:id="handsNumLabel" text="0" />
+                <Label text="Текущий жест:">
+                    <padding>
+                        <Insets left="10.0" />
+                    </padding>
+                </Label>
+                <Label fx:id="currentPoseLabel" text="None" />
+                <Label text="FPS:">
+                    <HBox.margin>
+                        <Insets left="10.0" />
+                    </HBox.margin>
+                </Label>
+                <Label fx:id="fpsLabel" text="0" />
+                <Label layoutX="124.0" layoutY="11.0" text="Объект:">
+                    <padding>
+                        <Insets left="10.0" />
+                    </padding>
+                </Label>
+                <Label fx:id="objectFileLabel" layoutX="224.0" layoutY="11.0" text="не задан" />
+            </children>
+        </HBox>
+    </bottom>
+    <top>
+        <MenuBar BorderPane.alignment="CENTER">
+            <menus>
+                <Menu mnemonicParsing="false" text="Файл">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#onCreateProjectBtnClicked" text="Создать проект" />
+                        <MenuItem mnemonicParsing="false" onAction="#onOpenProjectBtnClicked" text="Открыть проект" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem mnemonicParsing="false" onAction="#onSaveProjectBtnClicked" text="Сохранить" />
+                        <MenuItem mnemonicParsing="false" onAction="#onSaveProjectAsBtnClicked" text="Сохранить как" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem fx:id="exitButton" mnemonicParsing="false" onAction="#onExitBtnClicked" text="Закрыть" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Помощь">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#onAboutProjectBtnClicked" text="О программе" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+    </top>
+    <center>
+        <Pane fx:id="mainScene" prefHeight="354.0" prefWidth="514.0" BorderPane.alignment="CENTER" />
+    </center>
+    <right>
+        <VBox BorderPane.alignment="CENTER">
+            <children>
+                <TabPane focusTraversable="false" nodeOrientation="LEFT_TO_RIGHT" prefHeight="400.0" prefWidth="300.0" tabClosingPolicy="UNAVAILABLE">
+                    <tabs>
+                        <Tab text="Проект">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <VBox layoutX="5.0" layoutY="4.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="4.0">
+                                            <children>
+                                                <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0">
+                                                    <items>
+                                                        <Button fx:id="deleteFileFromProjectButton" disable="true" mnemonicParsing="false" onAction="#onDeleteFileFromProjectBtnClicked" prefHeight="30.0" prefWidth="30.0" text="-" />
+                                                        <Button fx:id="addFileToProjectButton" disable="true" mnemonicParsing="false" onAction="#onAddFileToProjectBtnClicked" prefHeight="30.0" prefWidth="30.0" text="+" />
+                                                        <Button fx:id="reloadProjectTreeButton" disable="true" mnemonicParsing="false" onAction="#onReloadProjectBtnClicked" prefHeight="30.0" prefWidth="30.0" text="↻" />
+                                                        <Button fx:id="setModelSceneButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" onAction="#onSetModelSceneBtnClicked" prefHeight="30.0" prefWidth="174.0" text="Открыть объект" />
+                                                    </items>
+                                                </ToolBar>
+                                                <TreeView fx:id="projectTree" prefHeight="222.0" prefWidth="290.0" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+                        <Tab text="Настройки">
+                            <content>
+                                <AnchorPane prefHeight="326.0" prefWidth="161.0">
+                                    <children>
+                                        <VBox prefHeight="350.0" prefWidth="290.0" spacing="10.0" AnchorPane.bottomAnchor="-4.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                                            <children>
+                                                <Label text="Пользовательские настройки">
+                                                    <font>
+                                                        <Font size="14.0" />
+                                                    </font>
+                                                </Label>
+                                                <HBox alignment="CENTER_LEFT" fillHeight="false">
+                                                    <children>
+                                                        <Label text="Вращение объекта:" HBox.hgrow="ALWAYS" />
+                                                        <TextField fx:id="rotateSensitivityField" prefHeight="26.0" prefWidth="90.0">
+                                                            <HBox.margin>
+                                                                <Insets left="10.0" />
+                                                            </HBox.margin>
+                                                        </TextField>
+                                                        <Slider fx:id="rotateSensitivitySlider" blockIncrement="1.0" max="5000.0" min="0.0" prefWidth="120.0">
+                                                            <HBox.margin>
+                                                                <Insets left="10.0" />
+                                                            </HBox.margin>
+                                                        </Slider>
+                                                    </children>
+                                                </HBox>
+                                                <HBox alignment="CENTER_LEFT" fillHeight="false">
+                                                    <children>
+                                                        <Label text="Перемещение камеры:" HBox.hgrow="ALWAYS" />
+                                                        <TextField fx:id="cameraPanSensitivityField" prefHeight="26.0" prefWidth="90.0">
+                                                            <HBox.margin>
+                                                                <Insets left="10.0" />
+                                                            </HBox.margin>
+                                                        </TextField>
+                                                        <Slider fx:id="cameraPanSensitivitySlider" blockIncrement="1.0" max="5000.0" min="0.0" prefWidth="120.0">
+                                                            <HBox.margin>
+                                                                <Insets left="10.0" />
+                                                            </HBox.margin>
+                                                        </Slider>
+                                                    </children>
+                                                </HBox>
+                                                <HBox alignment="CENTER_LEFT" fillHeight="false">
+                                                    <children>
+                                                        <Label text="Масштаб камеры:" HBox.hgrow="ALWAYS" />
+                                                        <TextField fx:id="cameraScaleSensitivityField" prefHeight="26.0" prefWidth="90.0">
+                                                            <HBox.margin>
+                                                                <Insets left="10.0" />
+                                                            </HBox.margin>
+                                                        </TextField>
+                                                        <Slider fx:id="cameraScaleSensitivitySlider" blockIncrement="1.0" max="5000.0" min="0.0" prefWidth="120.0">
+                                                            <HBox.margin>
+                                                                <Insets left="10.0" />
+                                                            </HBox.margin>
+                                                        </Slider>
+                                                    </children>
+                                                </HBox>
+                                                <HBox alignment="CENTER_LEFT" fillHeight="false">
+                                                    <children>
+                                                        <Label text="Сила освещения:" HBox.hgrow="ALWAYS" />
+                                                        <TextField fx:id="lightingRangeCoefficientField" prefHeight="26.0" prefWidth="90.0">
+                                                            <HBox.margin>
+                                                                <Insets left="10.0" />
+                                                            </HBox.margin>
+                                                        </TextField>
+                                                        <Slider fx:id="lightingRangeCoefficientSlider" blockIncrement="0.1" max="10.0" min="2.0" prefWidth="120.0">
+                                                            <HBox.margin>
+                                                                <Insets left="10.0" />
+                                                            </HBox.margin>
+                                                        </Slider>
+                                                    </children>
+                                                </HBox>
+                                                <HBox alignment="CENTER_LEFT" fillHeight="false" prefHeight="34.0" prefWidth="290.0">
+                                                    <children>
+                                                        <Label text="Цвет фона:" HBox.hgrow="ALWAYS" />
+                                                        <ColorPicker fx:id="backgroundColorPicker" prefHeight="33.0" prefWidth="126.0">
+                                                            <HBox.margin>
+                                                                <Insets left="10.0" />
+                                                            </HBox.margin>
+                                                        </ColorPicker>
+                                                    </children>
+                                                </HBox>
+                                                <HBox alignment="CENTER_LEFT" fillHeight="false" prefHeight="27.0" prefWidth="290.0">
+                                                    <children>
+                                                        <Label text="Камера:" HBox.hgrow="ALWAYS" />
+                                                        <ChoiceBox fx:id="choiceCamera" prefHeight="26.0" prefWidth="218.0" HBox.hgrow="ALWAYS">
+                                                            <HBox.margin>
+                                                                <Insets left="10.0" />
+                                                            </HBox.margin></ChoiceBox>
+                                                    </children>
+                                                </HBox>
+                                                <HBox prefHeight="23.0" prefWidth="290.0" spacing="10.0">
+                                                    <children>
+                                                        <Button fx:id="saveUserSettingsButton" mnemonicParsing="false" onAction="#onSaveUserSettingsBtnClicked" prefHeight="26.0" prefWidth="141.0" text="Сохранить" />
+                                                        <Button fx:id="resetUserSettingsButton" mnemonicParsing="false" onAction="#onResetUserSettingsBtnClicked" prefHeight="26.0" prefWidth="141.0" text="Сбросить" />
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                            <VBox.margin>
+                                                <Insets left="5.0" top="5.0" />
+                                            </VBox.margin>
+                                        </VBox>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+                    </tabs>
+                </TabPane>
+                <Region prefHeight="54.0" prefWidth="300.0" VBox.vgrow="ALWAYS" />
+                <VBox>
+                    <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" />
+                    </VBox.margin>
+                    <children>
+                        <ImageView fx:id="webcamView" fitHeight="217.5" fitWidth="290.0" pickOnBounds="true" preserveRatio="true" visible="false" />
+                        <CheckBox fx:id="showVideoCheckBox" mnemonicParsing="false" onAction="#onShowVideoCheckBox" text="Включить показ камеры" />
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </right>
+</BorderPane>

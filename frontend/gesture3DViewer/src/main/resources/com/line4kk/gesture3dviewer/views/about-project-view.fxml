@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="320.0" prefWidth="480.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.line4kk.gesture3dviewer.ui.controllers.AboutProjectController">
+   <top>
+      <Label contentDisplay="CENTER" prefHeight="46.0" prefWidth="624.0" text="О проекте" BorderPane.alignment="CENTER_LEFT">
+         <font>
+            <Font size="24.0" />
+         </font>
+         <BorderPane.margin>
+            <Insets left="10.0" top="10.0" />
+         </BorderPane.margin>
+      </Label>
+   </top>
+   <center>
+      <VBox alignment="TOP_LEFT" prefHeight="220.0" prefWidth="480.0" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets left="15.0" right="15.0" />
+         </BorderPane.margin>
+         <children>
+
+            <!-- Название -->
+            <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
+               <children>
+                  <Label prefWidth="140.0" text="Приложение:">
+                     <font><Font size="14.0" /></font>
+                  </Label>
+                  <Label text="Gesture3D Viewer">
+                     <font><Font size="14.0" /></font>
+                  </Label>
+               </children>
+               <VBox.margin><Insets top="10.0" /></VBox.margin>
+            </HBox>
+
+            <!-- Версия -->
+            <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
+               <children>
+                  <Label prefWidth="140.0" text="Версия:">
+                     <font><Font size="14.0" /></font>
+                  </Label>
+                  <Label fx:id="versionLabel" text="0.1.0-alpha">
+                     <font><Font size="14.0" /></font>
+                  </Label>
+               </children>
+               <VBox.margin><Insets top="8.0" /></VBox.margin>
+            </HBox>
+
+            <Separator>
+               <VBox.margin><Insets bottom="4.0" top="14.0" /></VBox.margin>
+            </Separator>
+
+            <!-- Стек -->
+            <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
+               <children>
+                  <Label prefWidth="140.0" text="Backend:">
+                     <font><Font size="14.0" /></font>
+                  </Label>
+                  <Label text="Java, JavaFX">
+                     <font><Font size="14.0" /></font>
+                  </Label>
+               </children>
+               <VBox.margin><Insets top="6.0" /></VBox.margin>
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
+               <children>
+                  <Label prefWidth="140.0" text="Frontend:">
+                     <font><Font size="14.0" /></font>
+                  </Label>
+                  <Label text="Python, MediaPipe, OpenCV">
+                     <font><Font size="14.0" /></font>
+                  </Label>
+               </children>
+               <VBox.margin><Insets top="6.0" /></VBox.margin>
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
+               <children>
+                  <Label prefWidth="140.0" text="Связь:">
+                     <font><Font size="14.0" /></font>
+                  </Label>
+                  <Label text="ZeroMQ">
+                     <font><Font size="14.0" /></font>
+                  </Label>
+               </children>
+               <VBox.margin><Insets top="6.0" /></VBox.margin>
+            </HBox>
+
+            <!-- Автор -->
+            <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
+               <children>
+                  <Label prefWidth="140.0" text="Автор:">
+                     <font><Font size="14.0" /></font>
+                  </Label>
+                  <Label fx:id="authorLabel" text="line4kk">
+                     <font><Font size="14.0" /></font>
+                  </Label>
+               </children>
+               <VBox.margin><Insets top="6.0" /></VBox.margin>
+            </HBox>
+
+         </children>
+      </VBox>
+   </center>
+   <bottom>
+      <ButtonBar prefHeight="42.0" prefWidth="480.0" BorderPane.alignment="CENTER">
+         <buttons>
+            <Button fx:id="closeButton" mnemonicParsing="false" onAction="#closeWindow" text="Закрыть">
+               <font><Font size="14.0" /></font>
+            </Button>
+         </buttons>
+         <BorderPane.margin>
+            <Insets bottom="5.0" right="10.0" />
+         </BorderPane.margin>
+      </ButtonBar>
+   </bottom>
+</BorderPane>

@@ -128,3 +128,14 @@ def is_tips_close(landmarks: List[List[NormalizedLandmark]], max_distance_coeffi
     distance2 = distance(index2_tip, thumb1_tip)
 
     return distance1 <= max_distance1 and distance2 <= max_distance2
+
+def get_finger_vector(hand_landmarks: List[NormalizedLandmark], finger: int):
+    validate_finger_number(finger)
+    mcp = landmark_to_xOy_projection(hand_landmarks[1 + 4 * finger])
+    tip = landmark_to_xOy_projection(hand_landmarks[4 + 4 * finger])
+    return to_np_vector(mcp, tip)
+
+def get_thumb_vector(hand_landmarks: List[NormalizedLandmark]):
+    mcp = landmark_to_xOy_projection(hand_landmarks[2])
+    tip = landmark_to_xOy_projection(hand_landmarks[4])
+    return to_np_vector(mcp, tip)

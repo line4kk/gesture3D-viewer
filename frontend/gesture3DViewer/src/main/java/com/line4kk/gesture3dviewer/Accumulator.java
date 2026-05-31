@@ -2,7 +2,7 @@ package com.line4kk.gesture3dviewer;
 
 import com.line4kk.gesture3dviewer.model.AccumulatedData;
 import com.line4kk.gesture3dviewer.model.GestureMessage;
-import com.line4kk.gesture3dviewer.model.SensitivitySettings;
+import com.line4kk.gesture3dviewer.model.ViewerSettings;
 
 public class Accumulator {
     private double degreesX = 0.0;
@@ -17,18 +17,18 @@ public class Accumulator {
     public synchronized void accumulate(GestureMessage message) {
         switch (message.type) {
             case "rotate":
-                degreesX += message.dy * SensitivitySettings.rotateSensitivity;
-                degreesY += message.dx * SensitivitySettings.rotateSensitivity;
+                degreesX += message.dy * ViewerSettings.rotateSensitivity;
+                degreesY += message.dx * ViewerSettings.rotateSensitivity;
                 break;
             case "rotate_z":
-                degreesZ += message.dz * SensitivitySettings.rotateSensitivity;
+                degreesZ += message.dz * ViewerSettings.rotateSensitivity;
                 break;
             case "camera_pan":
-                dxCameraPan += message.dx * SensitivitySettings.cameraPanSensitivity;
-                dyCameraPan += message.dy * -SensitivitySettings.cameraPanSensitivity;
+                dxCameraPan += message.dx * ViewerSettings.cameraPanSensitivity;
+                dyCameraPan += message.dy * -ViewerSettings.cameraPanSensitivity;
                 break;
             case "camera_scale":
-                deltaScale += message.dr * SensitivitySettings.cameraScaleSensitivity;
+                deltaScale += message.dr * ViewerSettings.cameraScaleSensitivity;
                 break;
             case "reset_view":
                 resetView = true;
