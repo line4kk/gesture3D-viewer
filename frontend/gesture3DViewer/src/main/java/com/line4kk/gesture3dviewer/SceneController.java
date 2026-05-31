@@ -282,10 +282,14 @@ public class SceneController {
                 return;
             }
 
+            double clampedValue = clampToSlider(parsedValue, slider);
             settingsSyncing = true;
             try {
-                slider.setValue(parsedValue);
-                setter.accept(parsedValue);
+                if (clampedValue != parsedValue) {
+                    field.setText(formatSetting(clampedValue));
+                }
+                slider.setValue(clampedValue);
+                setter.accept(clampedValue);
                 applyRuntimeSettings(currentUserSettings);
                 markSettingsDirty();
             }
@@ -301,7 +305,10 @@ public class SceneController {
 
             settingsSyncing = true;
             try {
-                double value = newValue.doubleValue();
+                double value = clampToSlider(newValue.doubleValue(), slider);
+                if (value != newValue.doubleValue()) {
+                    slider.setValue(value);
+                }
                 field.setText(formatSetting(value));
                 setter.accept(value);
                 applyRuntimeSettings(currentUserSettings);
@@ -331,6 +338,12 @@ public class SceneController {
             return String.valueOf((long) value);
         }
         return String.valueOf(value);
+    }
+
+    private double clampToSlider(double value, Slider slider) {
+        double min = slider.getMin();
+        double max = slider.getMax();
+        return Math.max(min, Math.min(max, value));
     }
 
     private void applyRuntimeSettings(UserSettings settings) {
