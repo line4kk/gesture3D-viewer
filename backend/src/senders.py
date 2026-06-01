@@ -14,7 +14,7 @@ logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
 class DataSender:
-    def __init__(self, context: zmq.Context, address="tcp://*:5555"):
+    def __init__(self, context: zmq.Context, address="tcp://localhost:5555"):
         self.context = context
         self.socket = self.context.socket(zmq.PUB)
         self.socket.bind(address)
@@ -56,7 +56,7 @@ class DataSender:
 
 
 class UserVideoSender:
-    def __init__(self, context: zmq.Context, address="tcp://*:5556"):
+    def __init__(self, context: zmq.Context, address="tcp://localhost:5556"):
         self.context = context
         self.socket = self.context.socket(zmq.PUB)
         self.socket.setsockopt(zmq.SNDHWM, 1)
@@ -95,7 +95,7 @@ class UserVideoSender:
         self.close()
 
 class CommandReceiver:
-    def __init__(self, context: zmq.Context, address="tcp://*:5557"):
+    def __init__(self, context: zmq.Context, address="tcp://localhost:5557"):
         self.context = context
         self.socket = self.context.socket(zmq.REP)
         self.socket.bind(address)

@@ -72,7 +72,7 @@ def main():
 
     context = zmq.Context()
     recognize_data_sender = DataSender(context)
-    stats_sender = DataSender(context, "tcp://*:5558")
+    stats_sender = DataSender(context, "tcp://localhost:5558")
     video_sender = UserVideoSender(context)
     command_receiver = CommandReceiver(context)
 
